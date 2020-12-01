@@ -1,0 +1,42 @@
+syntax = "proto3";
+package protobuf;
+option go_package = ".;protobuf";
+import "Etpmls/Etpmls-Micro/common.proto";
+import "google/api/annotations.proto";
+
+message AttachmentCreate {
+    string service=1;
+    string storage_method=2;
+    string path=3;
+    uint32 owner_id=4;
+    string owner_type=5;
+}
+
+message AttachmentGetOne {
+    string service=1;
+    uint32 owner_id=2;
+    string owner_type=3;
+}
+
+message AttachmentDiskCleanUp {
+    string service=1;
+}
+
+service Attachment {
+    rpc Create (AttachmentCreate) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            post: "/api/v1/attachment/create"
+            body: "*"
+        };
+    };
+    rpc GetOne (AttachmentGetOne) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            get: "/api/v1/attachment/getOne"
+        };
+    };
+    rpc DiskCleanUp (AttachmentDiskCleanUp) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            get: "/api/v1/attachment/diskCleanUp"
+        };
+    };
+}

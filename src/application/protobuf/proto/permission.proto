@@ -1,0 +1,48 @@
+syntax = "proto3";
+package protobuf;
+option go_package = ".;protobuf";
+import "Etpmls/Etpmls-Micro/common.proto";
+import "google/api/annotations.proto";
+
+message PermissionCreate {
+    string name=1;
+    string path=2;
+    string remark=3;
+}
+
+message PermissionEdit {
+    uint32 id=1;
+    string name=2;
+    string path=3;
+    string remark=4;
+}
+
+message PermissionDelete {
+    repeated em_protobuf.Id permissions=1;
+}
+
+service Permission {
+    rpc GetAll (em_protobuf.Pagination) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            get: "/api/v1/permission/getAll"
+        };
+    };
+    rpc Create (PermissionCreate) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            post: "/api/v1/permission/create"
+            body: "*"
+        };
+    };
+    rpc Edit (PermissionEdit) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            put: "/api/v1/permission/edit"
+            body: "*"
+        };
+    };
+    rpc Delete (PermissionDelete) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            delete: "/api/v1/permission/delete"
+            body: "*"
+        };
+    };
+}

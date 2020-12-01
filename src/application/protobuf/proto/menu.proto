@@ -1,0 +1,23 @@
+syntax = "proto3";
+package protobuf;
+option go_package = ".;protobuf";
+import "Etpmls/Etpmls-Micro/common.proto";
+import "google/api/annotations.proto";
+
+message MenuCreate {
+    string menu=1;
+}
+
+service Menu {
+    rpc GetAll (em_protobuf.Empty) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            get: "/api/v1/menu/getAll"
+        };
+    };
+    rpc Create (MenuCreate) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            post: "/api/v1/menu/create"
+            body: "*"
+        };
+    };
+}
