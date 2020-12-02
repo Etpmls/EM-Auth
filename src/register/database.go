@@ -46,6 +46,11 @@ func InsertBasicDataToDatabase()  {
 			Auth: application.Auth_NoVerify,
 		},
 		{
+			Name: "User/UpdateInformation",
+			Path: "User/UpdateInformation",
+			Auth: application.Auth_BasicVerify,
+		},
+		{
 			Name: "User/Get Current",
 			Path: "User/GetCurrent",
 			Auth: application.Auth_BasicVerify,
@@ -133,6 +138,17 @@ func InsertBasicDataToDatabase()  {
 			},
 		},
 		{
+			Name: "Permission/GetAdvancedVerify",
+			Path: "Permission/GetAdvancedVerify",
+			Auth: application.Auth_AdvancedVerify,
+			Remark: "View permission list",
+			Roles: []database.Role{
+				{
+					Model:       gorm.Model{ID:1},
+				},
+			},
+		},
+		{
 			Name: "Permission/View",
 			Path: "Permission/GetAll",
 			Auth: application.Auth_AdvancedVerify,
@@ -201,6 +217,31 @@ func InsertBasicDataToDatabase()  {
 		{
 			Name: "Setting/Disk Clean Up",
 			Path: "Setting/DiskCleanUp",
+			Auth: application.Auth_AdvancedVerify,
+			Roles: []database.Role{
+				{
+					Model:       gorm.Model{ID:1},
+				},
+			},
+		},
+		{
+			Name: "Setting/Disk Clean Up",
+			Path: "Setting/DiskCleanUp",
+			Auth: application.Auth_AdvancedVerify,
+			Roles: []database.Role{
+				{
+					Model:       gorm.Model{ID:1},
+				},
+			},
+		},
+		{
+			Name: "Attachment/Get One",
+			Path: "Attachment/GetOne",
+			Auth: application.Auth_NoVerify,
+		},
+		{
+			Name: "Attachment/Create",
+			Path: "Attachment/Create",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{

@@ -10,6 +10,7 @@ import (
 	"github.com/Etpmls/Etpmls-Micro/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"strconv"
 )
 
 type ServiceAuth struct {
@@ -49,7 +50,7 @@ func (this *ServiceAuth) Check(ctx context.Context, request *em_protobuf.AuthChe
 			Success: true,
 		}, nil
 	case application.Auth_AdvancedVerify:
-		err := middleware.NewAuth().PermissionVerify(request.GetService(), string(request.GetUserId()))
+		err := middleware.NewAuth().PermissionVerify(request.GetService(), strconv.Itoa(int(request.GetUserId())))
 		if err == nil {
 			return &em_protobuf.AuthCheckResponse{
 				Success: true,

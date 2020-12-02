@@ -22,6 +22,7 @@ type PermissionClient interface {
 	Create(ctx context.Context, in *PermissionCreate, opts ...grpc.CallOption) (*protobuf.Response, error)
 	Edit(ctx context.Context, in *PermissionEdit, opts ...grpc.CallOption) (*protobuf.Response, error)
 	Delete(ctx context.Context, in *PermissionDelete, opts ...grpc.CallOption) (*protobuf.Response, error)
+	GetAdvancedVerify(ctx context.Context, in *protobuf.Empty, opts ...grpc.CallOption) (*protobuf.Response, error)
 }
 
 type permissionClient struct {
@@ -68,6 +69,15 @@ func (c *permissionClient) Delete(ctx context.Context, in *PermissionDelete, opt
 	return out, nil
 }
 
+func (c *permissionClient) GetAdvancedVerify(ctx context.Context, in *protobuf.Empty, opts ...grpc.CallOption) (*protobuf.Response, error) {
+	out := new(protobuf.Response)
+	err := c.cc.Invoke(ctx, "/protobuf.Permission/GetAdvancedVerify", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PermissionServer is the server API for Permission service.
 // All implementations must embed UnimplementedPermissionServer
 // for forward compatibility
@@ -76,6 +86,7 @@ type PermissionServer interface {
 	Create(context.Context, *PermissionCreate) (*protobuf.Response, error)
 	Edit(context.Context, *PermissionEdit) (*protobuf.Response, error)
 	Delete(context.Context, *PermissionDelete) (*protobuf.Response, error)
+	GetAdvancedVerify(context.Context, *protobuf.Empty) (*protobuf.Response, error)
 	mustEmbedUnimplementedPermissionServer()
 }
 
@@ -94,6 +105,9 @@ func (UnimplementedPermissionServer) Edit(context.Context, *PermissionEdit) (*pr
 }
 func (UnimplementedPermissionServer) Delete(context.Context, *PermissionDelete) (*protobuf.Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedPermissionServer) GetAdvancedVerify(context.Context, *protobuf.Empty) (*protobuf.Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAdvancedVerify not implemented")
 }
 func (UnimplementedPermissionServer) mustEmbedUnimplementedPermissionServer() {}
 
@@ -180,6 +194,24 @@ func _Permission_Delete_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Permission_GetAdvancedVerify_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(protobuf.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PermissionServer).GetAdvancedVerify(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protobuf.Permission/GetAdvancedVerify",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PermissionServer).GetAdvancedVerify(ctx, req.(*protobuf.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Permission_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "protobuf.Permission",
 	HandlerType: (*PermissionServer)(nil),
@@ -199,6 +231,10 @@ var _Permission_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _Permission_Delete_Handler,
+		},
+		{
+			MethodName: "GetAdvancedVerify",
+			Handler:    _Permission_GetAdvancedVerify_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -6,15 +6,17 @@ import "google/api/annotations.proto";
 
 message PermissionCreate {
     string name=1;
-    string path=2;
-    string remark=3;
+    uint32 auth=2;
+    string path=3;
+    string remark=4;
 }
 
 message PermissionEdit {
     uint32 id=1;
     string name=2;
-    string path=3;
-    string remark=4;
+    uint32 auth=3;
+    string path=4;
+    string remark=5;
 }
 
 message PermissionDelete {
@@ -43,6 +45,11 @@ service Permission {
         option (google.api.http) = {
             delete: "/api/v1/permission/delete"
             body: "*"
+        };
+    };
+    rpc GetAdvancedVerify (em_protobuf.Empty) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            get: "/api/v1/permission/getAdvancedVerify"
         };
     };
 }

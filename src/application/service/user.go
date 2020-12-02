@@ -112,7 +112,12 @@ func (this *ServiceUser) getCurrent_NoCache(ctx context.Context, request *protob
 	var userApi = tmp{ UserGetOne: filter_user }
 
 	// Avatar
-	path := client.NewClient().User_GetAvatar(uint32(u.ID), application.Relationship_User_Avatar)
+	// 1.Get token By Request
+	var path string
+	token, err := em.NewAuth().GetTokenFromCtx(ctx)
+	if err == nil {
+		path = client.NewClient().User_GetAvatar(token, uint32(u.ID), application.Relationship_User_Avatar)
+	}
 
 	userApi.Avatar = path
 	// Roles

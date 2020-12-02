@@ -16,11 +16,11 @@ import (
 
 // Get User avatar
 // 获取用户头像
-func (this *client) User_GetAvatar(owner_id uint32, owner_type string) (string) {
+func (this *client) User_GetAvatar(token string, owner_id uint32, owner_type string) (string) {
 	cl := em.NewClient()
 	output := make(chan string, 1)
 	errs := cl.Go("common", func() error {
-
+		// 1.Connect Service
 		conn, err := cl.ConnectService(application.Service_AttachmentService)
 		if err != nil {
 			return err
@@ -31,6 +31,10 @@ func (this *client) User_GetAvatar(owner_id uint32, owner_type string) (string) 
 		// Contact the server and print out its response.
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
+
+		// 2.Set Token
+		cl.SetValueToClientHeader(&ctx, map[string]string{"token": token})
+
 		r, err := c.GetOne(ctx, &protobuf.AttachmentGetOne{
 			Service:       em_library.Config.ServiceDiscovery.Service.Name,
 			OwnerId:       owner_id,

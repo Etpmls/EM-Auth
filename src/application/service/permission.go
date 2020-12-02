@@ -119,6 +119,13 @@ func (this *ServicePermission) Edit(ctx context.Context, request *protobuf.Permi
 		p.CreatedAt = old_p.CreatedAt
 		tx.Save(&p)
 
+		if old_p.Auth == application.Auth_AdvancedVerify && p.Auth != application.Auth_AdvancedVerify {
+			err := em.DB.Model(&p).Association("Roles").Clear()
+			if err != nil {
+				return err
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -185,4 +192,11 @@ func (this *ServicePermission) Delete(ctx context.Context, request *protobuf.Per
 	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Delete"), nil)
 }
 
-
+// Get Advanced verify permissions
+// 获取高级认证权限
+func (this *ServicePermission) GetAdvancedVerify(ctx context.Context, request *em_protobuf.Empty) (*em_protobuf.Response, error) {
+	type Permission model.PermissionGetOne
+	var data []Permission
+	em.DB.Where("auth = ?", application.Auth_AdvancedVerify).Find(&data)
+	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), data)
+}
