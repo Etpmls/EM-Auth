@@ -119,13 +119,6 @@ func (this *ServicePermission) Edit(ctx context.Context, request *protobuf.Permi
 		p.CreatedAt = old_p.CreatedAt
 		tx.Save(&p)
 
-		if old_p.Auth == application.Auth_AdvancedVerify && p.Auth != application.Auth_AdvancedVerify {
-			err := em.DB.Model(&p).Association("Roles").Clear()
-			if err != nil {
-				return err
-			}
-		}
-
 		return nil
 	})
 	if err != nil {

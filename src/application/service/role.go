@@ -12,6 +12,7 @@ import (
 	"github.com/Etpmls/Etpmls-Micro/utils"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 
@@ -108,6 +109,8 @@ func (this *ServiceRole) Edit(ctx context.Context, request *protobuf.RoleEdit) (
 	}
 
 	err = em.DB.Transaction(func(tx *gorm.DB) error {
+		// Edit Role
+		// 修改角色
 		var old_r model.Role
 		result := tx.First(&old_r, request.Id)
 		if result.RowsAffected == 0 {
@@ -115,7 +118,14 @@ func (this *ServiceRole) Edit(ctx context.Context, request *protobuf.RoleEdit) (
 		}
 
 		r.CreatedAt = old_r.CreatedAt
-		tx.Save(&r)
+		tx.Omit(clause.Associations).Save(&r)
+
+		// Update Relationship
+		// 更新关联
+		err := em.DB.Model(&r).Association("Permissions").Replace(r.Permissions)
+		if err != nil {
+			return err
+		}
 
 		return nil
 	})

@@ -12,7 +12,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"path/filepath"
 	"strconv"
 )
@@ -56,7 +55,7 @@ func (this *middleware) Auth() grpc.UnaryServerInterceptor {
 			return NewAuth().AdvancedVerify(ctx, req, handler, service)
 		}
 
-		return nil, status.Error(codes.InvalidArgument, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_PermissionDenied"))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_PermissionDenied"), nil, errors.New("ERROR_MESSAGE_PermissionDenied"))
 	}
 }
 
@@ -74,13 +73,12 @@ func (this *auth) BasicVerify(ctx context.Context, req interface{}, handler grpc
 	g := em_library.NewGrpc()
 	token, err := g.ExtractHeader(ctx, "token")
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_GetToken"))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_GetToken"), nil, err)
 	}
 
 	_, err = em_library.JwtToken.ParseToken(token)
 	if err != nil {
-		_, newErr := em.ErrorRpc(codes.Unauthenticated, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_TokenVerificationFailed"), nil, err)
-		return nil, newErr
+		return em.ErrorRpc(codes.Unauthenticated, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_TokenVerificationFailed"), nil, err)
 	}
 
 	// Pass the token to the method
@@ -96,7 +94,7 @@ func (this *auth) AdvancedVerify(ctx context.Context, req interface{}, handler g
 	g := em_library.NewGrpc()
 	token, err := g.ExtractHeader(ctx, "token")
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_GetToken"))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code,  fullMethodName + ":" + em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_GetToken"), nil, err)
 	}
 
 	// Get Claims
@@ -104,7 +102,7 @@ func (this *auth) AdvancedVerify(ctx context.Context, req interface{}, handler g
 	tmp, err := em_library.JwtToken.ParseToken(token)
 	tk, ok := tmp.(*jwt.Token)
 	if !ok || err != nil {
-		return nil, status.Error(codes.Unauthenticated, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_TokenVerificationFailed"))
+		return em.ErrorRpc(codes.Unauthenticated, em.ERROR_Code,  fullMethodName + ":" + em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_TokenVerificationFailed"), nil, err)
 	}
 
 	// Determine whether the role has the corresponding permissions
@@ -121,7 +119,7 @@ func (this *auth) AdvancedVerify(ctx context.Context, req interface{}, handler g
 		}
 	}
 
-	return nil, status.Error(codes.InvalidArgument, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_PermissionDenied"))
+	return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, fullMethodName + ":" + em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_PermissionDenied"), nil, errors.New("Permission denied"))
 }
 
 func (this *auth) PermissionVerify(service string, idStr string) (err error) {
