@@ -36,7 +36,7 @@ func (this *client) User_GetAvatar(token string, owner_id uint32, owner_type str
 		cl.SetValueToClientHeader(&ctx, map[string]string{"token": token})
 
 		r, err := c.GetOne(ctx, &protobuf.AttachmentGetOne{
-			Service:       em_library.Config.ServiceDiscovery.Service.Name,
+			Service:       em_library.Config.ServiceDiscovery.Service.Rpc.Name,
 			OwnerId:       owner_id,
 			OwnerType:     owner_type,
 		})
@@ -96,7 +96,7 @@ func (this *client) User_CreateAvatar(ctx context.Context, path string, owner_id
 		cl.SetValueToClientHeader(&ctx, map[string]string{"token": token})
 
 		r, err := c.Create(ctx, &protobuf.AttachmentCreate{
-			Service:       em_library.Config.ServiceDiscovery.Service.Name,
+			Service:       em_library.Config.ServiceDiscovery.Service.Rpc.Name,
 			Path:		   path,
 			OwnerId:       owner_id,
 			OwnerType:     owner_type,
@@ -134,7 +134,7 @@ func (this *client) Setting_DiskCleanUp() error {
 		defer cancel()
 
 		r, err := c.DiskCleanUp(ctx, &protobuf.AttachmentDiskCleanUp{
-			Service:       em_library.Config.ServiceDiscovery.Service.Name,
+			Service:       em_library.Config.ServiceDiscovery.Service.Rpc.Name,
 		})
 		if err != nil {
 			em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
