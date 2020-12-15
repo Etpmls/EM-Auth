@@ -205,9 +205,9 @@ func RegisterSettingHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 }
 
 var (
-	pattern_Setting_CacheClear_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "setting", "cacheClear"}, ""))
+	pattern_Setting_CacheClear_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "auth", "v1", "setting", "cacheClear"}, ""))
 
-	pattern_Setting_DiskCleanUp_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "setting", "diskCleanUp"}, ""))
+	pattern_Setting_DiskCleanUp_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "auth", "v1", "setting", "diskCleanUp"}, ""))
 )
 
 var (

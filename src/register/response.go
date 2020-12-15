@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/Etpmls/Etpmls-Micro"
 	"github.com/Etpmls/Etpmls-Micro/library"
-	em_utils "github.com/Etpmls/Etpmls-Micro/utils"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"strconv"
@@ -79,7 +79,7 @@ func MakeRpcSuccess(code string, message string, data interface{}) (*em.Response
 		Code:    code,
 		Status:  em.SUCCESS_Status,
 		Message: message,
-		Data:    em_utils.MustConvertJson(data),
+		Data:    em.MustConvertJson(data),
 	}, nil
 }
 

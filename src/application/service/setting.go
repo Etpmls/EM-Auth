@@ -8,7 +8,7 @@ import (
 	em "github.com/Etpmls/Etpmls-Micro"
 	em_library "github.com/Etpmls/Etpmls-Micro/library"
 	em_protobuf "github.com/Etpmls/Etpmls-Micro/protobuf"
-	"github.com/Etpmls/Etpmls-Micro/utils"
+
 	"google.golang.org/grpc/codes"
 )
 
@@ -26,7 +26,7 @@ func (this *ServiceSetting) CacheClear(ctx context.Context, request *em_protobuf
 	}
 
 	em_library.Cache.ClearAllCache()
-	em.LogDebug.Output(em_utils.MessageWithLineNum("Cleared all cache!"))
+	em.LogDebug.Output(em.MessageWithLineNum("Cleared all cache!"))
 
 	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Clear"), nil)
 }
@@ -34,11 +34,11 @@ func (this *ServiceSetting) CacheClear(ctx context.Context, request *em_protobuf
 // Disk Cleanup
 // 清理磁盘
 func (this *ServiceSetting) DiskCleanUp(ctx context.Context, request *em_protobuf.Empty) (*em_protobuf.Response, error) {
-	err := client.NewClient().Setting_DiskCleanUp()
+	err := client.NewClient().Setting_DiskCleanUp(ctx)
 	if err != nil {
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Delete"), nil, err)
 	}
 
-	em.LogDebug.Output(em_utils.MessageWithLineNum("Disk cleanup complete!"))
+	em.LogDebug.Output(em.MessageWithLineNum("Disk cleanup complete!"))
 	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Clear"), nil)
 }

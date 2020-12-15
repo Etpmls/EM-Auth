@@ -17,10 +17,9 @@ func RegisterGrpcMiddleware() *grpc.Server {
 				// Panic recover
 				grpc_recovery.UnaryServerInterceptor(),
 				// I18n
-				em.NewMiddleware().I18n(),
+				em.DefaultMiddleware().I18n(),
 				// Captcha auth
 				middleware.NewMiddleware().Captcha(),
-				// token auth
 				middleware.NewMiddleware().Auth(),
 			),
 		),

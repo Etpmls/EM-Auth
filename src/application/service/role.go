@@ -9,7 +9,7 @@ import (
 	em "github.com/Etpmls/Etpmls-Micro"
 	"github.com/Etpmls/Etpmls-Micro/library"
 	em_protobuf "github.com/Etpmls/Etpmls-Micro/protobuf"
-	"github.com/Etpmls/Etpmls-Micro/utils"
+
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -51,7 +51,7 @@ func (this *ServiceRole) Create(ctx context.Context, request *protobuf.RoleCreat
 	{
 		err := em_library.Validator.Validate(request, &validate_RoleCreate{})
 		if err != nil {
-			em.LogWarn.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
 			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
@@ -68,7 +68,7 @@ func (this *ServiceRole) Create(ctx context.Context, request *protobuf.RoleCreat
 		// Insert Data
 		result := tx.Create(&r)
 		if result.Error != nil {
-			em.LogError.Output(em_utils.MessageWithLineNum(result.Error.Error()))
+			em.LogError.Output(em.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
@@ -96,7 +96,7 @@ func (this *ServiceRole) Edit(ctx context.Context, request *protobuf.RoleEdit) (
 	{
 		err := em_library.Validator.Validate(request, &validate_RoleEdit{})
 		if err != nil {
-			em.LogWarn.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
 			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
@@ -150,7 +150,7 @@ func (this *ServiceRole) Delete(ctx context.Context, request *protobuf.RoleDelet
 	{
 		err := em_library.Validator.Validate(request, &validate_RoleDelete{})
 		if err != nil {
-			em.LogWarn.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
 			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
@@ -169,7 +169,7 @@ func (this *ServiceRole) Delete(ctx context.Context, request *protobuf.RoleDelet
 		// 删除角色
 		result := tx.Where("id IN ?", ids).Delete(&model.Role{})
 		if result.Error != nil {
-			em.LogError.Output(em_utils.MessageWithLineNum(result.Error.Error()))
+			em.LogError.Output(em.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
@@ -177,12 +177,12 @@ func (this *ServiceRole) Delete(ctx context.Context, request *protobuf.RoleDelet
 		// 删除关联
 		err := tx.Model(&r).Association("Users").Clear()
 		if err != nil {
-			em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogError.Output(em.MessageWithLineNum(err.Error()))
 			return err
 		}
 		err = tx.Model(&r).Association("Permissions").Clear()
 		if err != nil {
-			em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogError.Output(em.MessageWithLineNum(err.Error()))
 			return err
 		}
 

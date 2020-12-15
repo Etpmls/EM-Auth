@@ -25,8 +25,9 @@ type Role struct {
 type Permission struct {
 	gorm.Model
 	Name string
-	Path	string
 	Auth int
+	Method string
+	Path	string
 	Remark string
 	Roles []Role `gorm:"many2many:role_permissions;"`
 }

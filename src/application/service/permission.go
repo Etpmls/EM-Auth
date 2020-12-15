@@ -9,7 +9,7 @@ import (
 	em "github.com/Etpmls/Etpmls-Micro"
 	"github.com/Etpmls/Etpmls-Micro/library"
 	em_protobuf "github.com/Etpmls/Etpmls-Micro/protobuf"
-	"github.com/Etpmls/Etpmls-Micro/utils"
+
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 )
@@ -42,8 +42,9 @@ func (this *ServicePermission) GetAll(ctx context.Context, request *em_protobuf.
 // 创建权限
 type validate_PermissionCreate struct {
 	Name string `json:"name" validate:"required,max=255"`
-	Path	string	`json:"path" validate:"required,max=255"`
 	Auth int	`json:"auth" validate:"min=0,max=10"`
+	Method string `json:"method" validate:"required,min=1"`
+	Path	string	`json:"path" validate:"required,max=255"`
 	Remark string `json:"remark" validate:"max=255"`
 }
 func (this *ServicePermission) Create(ctx context.Context, request *protobuf.PermissionCreate) (*em_protobuf.Response, error) {
@@ -51,7 +52,7 @@ func (this *ServicePermission) Create(ctx context.Context, request *protobuf.Per
 	{
 		err := em_library.Validator.Validate(request, &validate_PermissionCreate{})
 		if err != nil {
-			em.LogWarn.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
 			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
@@ -68,14 +69,14 @@ func (this *ServicePermission) Create(ctx context.Context, request *protobuf.Per
 		// Insert Data
 		result := tx.Create(&p)
 		if result.Error != nil {
-			em.LogError.Output(em_utils.MessageWithLineNum(result.Error.Error()))
+			em.LogError.Output(em.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
 		return nil
 	})
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
 	}
 
@@ -97,7 +98,7 @@ func (this *ServicePermission) Edit(ctx context.Context, request *protobuf.Permi
 	{
 		err := em_library.Validator.Validate(request, &validate_PermissionEdit{})
 		if err != nil {
-			em.LogWarn.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
 			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
@@ -122,7 +123,7 @@ func (this *ServicePermission) Edit(ctx context.Context, request *protobuf.Permi
 		return nil
 	})
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
 	}
 
@@ -143,7 +144,7 @@ func (this *ServicePermission) Delete(ctx context.Context, request *protobuf.Per
 	{
 		err := em_library.Validator.Validate(request, &validate_PermissionDelete{})
 		if err != nil {
-			em.LogWarn.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
 			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
@@ -174,7 +175,7 @@ func (this *ServicePermission) Delete(ctx context.Context, request *protobuf.Per
 		return nil
 	})
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Delete"), nil, err)
 	}
 

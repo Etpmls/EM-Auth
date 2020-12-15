@@ -11,7 +11,7 @@ import (
 	em "github.com/Etpmls/Etpmls-Micro"
 	"github.com/Etpmls/Etpmls-Micro/library"
 	em_protobuf "github.com/Etpmls/Etpmls-Micro/protobuf"
-	"github.com/Etpmls/Etpmls-Micro/utils"
+
 	"github.com/go-redis/redis/v8"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
@@ -46,7 +46,7 @@ func (this *ServiceUser) Login(ctx context.Context, request *protobuf.UserLogin)
 		var vd validate_UserLogin
 		err := em_library.Validator.Validate(request, &vd)
 		if err != nil {
-			em.LogWarn.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
 			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
@@ -55,14 +55,14 @@ func (this *ServiceUser) Login(ctx context.Context, request *protobuf.UserLogin)
 	var us model.User
 	usr, err := us.Verify(request.Username, request.Password)
 	if err != nil {
-		em.LogInfo.Output(em_utils.MessageWithLineNum("Verify user failed!"))
+		em.LogInfo.Output(em.MessageWithLineNum("Verify user failed!"))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Login"), nil, err)
 	}
 
 	//JWT
 	token, err := us.UserGetToken(usr.ID, usr.Username)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum("Get Token failed! Error:" + err.Error()))
+		em.LogError.Output(em.MessageWithLineNum("Get Token failed! Error:" + err.Error()))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Login"), nil, err)
 	}
 
@@ -100,7 +100,7 @@ func (this *ServiceUser) getCurrent_NoCache(ctx context.Context, request *protob
 	// Filter some field
 	filter_user, err := user.InterfaceToUserGetOne(u)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, em.LogError.OutputAndReturnError(em_utils.MessageWithLineNum(err.Error())))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
 	}
 
 	// Ignore the avatar tag in the User structure
@@ -114,10 +114,8 @@ func (this *ServiceUser) getCurrent_NoCache(ctx context.Context, request *protob
 	// Avatar
 	// 1.Get token By Request
 	var path string
-	token, err := em.NewAuth().GetTokenFromCtx(ctx)
-	if err == nil {
-		path = client.NewClient().User_GetAvatar(token, uint32(u.ID), application.Relationship_User_Avatar)
-	}
+	path, _ = client.NewClient().User_GetAvatar(request.GetToken(), uint32(u.ID), application.Relationship_User_Avatar)
+
 
 	userApi.Avatar = path
 	// Roles
@@ -144,7 +142,7 @@ func (this *ServiceUser) getCurrent_Cache(ctx context.Context, request *protobuf
 	var user model.User
 	id, err := user.GetUserIdByToken(request.Token)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, em.LogError.OutputAndReturnError(em_utils.MessageWithLineNum(err.Error())))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
 	}
 
 	str, err := em_library.Cache.GetHash(application.Cache_UserGetCurrent, strconv.Itoa(int(id)))
@@ -152,7 +150,7 @@ func (this *ServiceUser) getCurrent_Cache(ctx context.Context, request *protobuf
 		if err == redis.Nil {
 			return this.getCurrent_NoCache(ctx, request)
 		}
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, em.LogError.OutputAndReturnError(em_utils.MessageWithLineNum(err.Error())))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
 	}
 
 	type tmp struct {
@@ -163,7 +161,7 @@ func (this *ServiceUser) getCurrent_Cache(ctx context.Context, request *protobuf
 	var userApi tmp
 	err = json.Unmarshal([]byte(str), &userApi)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		em_library.Cache.DeleteHash(application.Cache_UserGetCurrent, strconv.Itoa(int(id)))
 	}
 
@@ -208,7 +206,7 @@ func (this *ServiceUser) Create(ctx context.Context, request *protobuf.UserCreat
 		var vd validate_UserCreate
 		err := em_library.Validator.Validate(request, &vd)
 		if err != nil {
-			em.LogWarn.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
 			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
@@ -225,7 +223,7 @@ func (this *ServiceUser) Create(ctx context.Context, request *protobuf.UserCreat
 	var count_username int64
 	em.DB.Model(&model.User{}).Where("username = ?", u.Username).Count(&count_username)
 	if count_username != 0 {
-		em.LogInfo.Output(em_utils.MessageWithLineNum("Username already exists"))
+		em.LogInfo.Output(em.MessageWithLineNum("Username already exists"))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_DuplicateUserName"), nil, errors.New("Username already exists"))
 	}
 
@@ -238,7 +236,7 @@ func (this *ServiceUser) Create(ctx context.Context, request *protobuf.UserCreat
 	var count int64
 	em.DB.Model(&model.Role{}).Where("id IN ?", role_ids).Count(&count)
 	if int(count) != len(role_ids) {
-		em.LogError.Output(em_utils.MessageWithLineNum("Role does not exist"))
+		em.LogError.Output(em.MessageWithLineNum("Role does not exist"))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, errors.New("Role does not exist"))
 	}
 
@@ -248,13 +246,13 @@ func (this *ServiceUser) Create(ctx context.Context, request *protobuf.UserCreat
 		// Bcrypt Password
 		u.Password, err = user.BcryptPassword(u.Password)
 		if err != nil {
-			return em.LogError.OutputAndReturnError(em_utils.MessageWithLineNum("Password encryption failed" + err.Error()))
+			return em.LogError.OutputAndReturnError(em.MessageWithLineNum("Password encryption failed" + err.Error()))
 		}
 
 		// Create User
 		result := tx.Create(&u)
 		if result.Error != nil {
-			return em.LogError.OutputAndReturnError(em_utils.MessageWithLineNum("Create user failed" + result.Error.Error()))
+			return em.LogError.OutputAndReturnError(em.MessageWithLineNum("Create user failed" + result.Error.Error()))
 		}
 
 		return nil
@@ -272,7 +270,7 @@ func (this *ServiceUser) Create(ctx context.Context, request *protobuf.UserCreat
 	data, err := user.InterfaceToUserGetOne(u)
 	if err != nil {
 		// No need to return
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 	}
 
 	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Create"), data)
@@ -288,9 +286,9 @@ type validate_UserEdit struct {
 func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (*em_protobuf.Response, error) {
 	// Validate
 	var vd validate_UserEdit
-	err := em_utils.ChangeType(request, &vd)
+	err := em.ChangeType(request, &vd)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
 	}
 	err = em_library.Validator.ValidateStruct(vd)
@@ -310,7 +308,7 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 	var form model.User
 	result := em.DB.First(&form, request.Id)
 	if result.RowsAffected == 0 {
-		em.LogWarn.Output(em_utils.MessageWithLineNum("No user record"))
+		em.LogWarn.Output(em.MessageWithLineNum("No user record"))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, errors.New("No user record"))
 	}
 
@@ -319,7 +317,7 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 	var count_username int64
 	em.DB.Model(&model.User{}).Where("username = ?", u.Username).Not(request.Id).Count(&count_username)
 	if count_username != 0 {
-		em.LogDebug.Output(em_utils.MessageWithLineNum("The user name already exists!"))
+		em.LogDebug.Output(em.MessageWithLineNum("The user name already exists!"))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_DuplicateUserName"), nil, errors.New("Username already exists"))
 	}
 
@@ -332,7 +330,7 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 	var count int64
 	em.DB.Model(&model.Role{}).Where("id IN ?", role_ids).Count(&count)
 	if int(count) != len(role_ids) {
-		em.LogWarn.Output(em_utils.MessageWithLineNum("Role does not exist"))
+		em.LogWarn.Output(em.MessageWithLineNum("Role does not exist"))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, errors.New("Role does not exist"))
 	}
 
@@ -341,7 +339,7 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 		var user model.User
 		u.Password, err = user.BcryptPassword(u.Password)
 		if err != nil {
-			em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogError.Output(em.MessageWithLineNum(err.Error()))
 			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
 		}
 	}
@@ -357,14 +355,14 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 		}
 		err = tx.Model(&model.User{ID: u.ID}).Association("Roles").Replace(roleslist)
 		if err != nil {
-			return em.LogError.OutputAndReturnError(em_utils.MessageWithLineNum(err.Error()))
+			return em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error()))
 		}
 
 		// Update operation, the updates method will not affect the association
 		// 更新操作，updates方法不会影响关联
 		result := tx.Model(&model.User{}).Where(u.ID).Updates(u)
 		if result.Error != nil {
-			return em.LogError.OutputAndReturnError(em_utils.MessageWithLineNum(result.Error.Error()))
+			return em.LogError.OutputAndReturnError(em.MessageWithLineNum(result.Error.Error()))
 		}
 
 		return nil
@@ -383,7 +381,7 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 	data, err := user.InterfaceToUserGetOne(u)
 	if err != nil {
 		// No need to return
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 	}
 
 	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Edit"), data)
@@ -397,9 +395,9 @@ type validate_UserDelete struct {
 func (this *ServiceUser) Delete(ctx context.Context, request *protobuf.UserDelete) (*em_protobuf.Response, error) {
 	// Validate
 	var vd validate_UserDelete
-	err := em_utils.ChangeType(request, &vd)
+	err := em.ChangeType(request, &vd)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Delete"), nil, err)
 	}
 	err = em_library.Validator.ValidateStruct(vd)
@@ -414,9 +412,9 @@ func (this *ServiceUser) Delete(ctx context.Context, request *protobuf.UserDelet
 
 	// Find if admin is included in ids
 	// 查找ids中是否包含admin
-	b := em_utils.CheckIfSliceContainsInt(1, ids)
+	b := em.CheckIfSliceContainsInt(1, ids)
 	if b {
-		em.LogWarn.Output(em_utils.MessageWithLineNum("Cannot delete administrator"))
+		em.LogWarn.Output(em.MessageWithLineNum("Cannot delete administrator"))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_ProhibitOperationOfAdministratorUsers"), nil, errors.New("Cannot delete administrator"))
 	}
 
@@ -427,14 +425,14 @@ func (this *ServiceUser) Delete(ctx context.Context, request *protobuf.UserDelet
 		// 删除用户
 		result := tx.Delete(&u)
 		if result.Error != nil {
-			em.LogError.Output(em_utils.MessageWithLineNum(result.Error.Error()))
+			em.LogError.Output(em.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 
 		// 删除关联
 		err = tx.Model(&u).Association("Roles").Clear()
 		if err != nil {
-			em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogError.Output(em.MessageWithLineNum(err.Error()))
 			return err
 		}
 
@@ -469,7 +467,7 @@ func (this *ServiceUser) UpdateInformation(ctx context.Context, request *protobu
 	{
 		err := em_library.Validator.Validate(request, &validate_UserUpdateInformation{})
 		if err != nil {
-			em.LogWarn.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
 			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
@@ -503,7 +501,7 @@ func (this *ServiceUser) UpdateInformation(ctx context.Context, request *protobu
 
 		result := tx.Model(&model.User{ID: id}).Updates(&u)
 		if result.Error != nil {
-			em.LogError.Output(em_utils.MessageWithLineNum(result.Error.Error()))
+			em.LogError.Output(em.MessageWithLineNum(result.Error.Error()))
 			return result.Error
 		}
 

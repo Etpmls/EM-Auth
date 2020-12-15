@@ -24,24 +24,24 @@ message RoleDelete {
 service Role {
     rpc GetAll (em_protobuf.Pagination) returns (em_protobuf.Response) {
         option (google.api.http) = {
-            get: "/api/v1/role/getAll"
+            get: "/api/auth/v1/role/getAll"
         };
     };
     rpc Create (RoleCreate) returns (em_protobuf.Response) {
         option (google.api.http) = {
-            post: "/api/v1/role/create"
+            post: "/api/auth/v1/role/create"
             body: "*"
         };
     };
     rpc Edit (RoleEdit) returns (em_protobuf.Response) {
         option (google.api.http) = {
-            put: "/api/v1/role/edit"
+            put: "/api/auth/v1/role/edit"
             body: "*"
         };
     };
     rpc Delete (RoleDelete) returns (em_protobuf.Response) {
         option (google.api.http) = {
-            delete: "/api/v1/role/delete"
+            delete: "/api/auth/v1/role/delete"
             body: "*"
         };
     };

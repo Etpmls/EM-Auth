@@ -5,7 +5,7 @@ import (
 	"github.com/Etpmls/EM-Auth/src/application"
 	em "github.com/Etpmls/Etpmls-Micro"
 	"github.com/Etpmls/Etpmls-Micro/library"
-	"github.com/Etpmls/Etpmls-Micro/utils"
+
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 	"time"
@@ -39,12 +39,12 @@ func (this *Role) InterfaceToRole(i interface{}) (Role, error) {
 	var r Role
 	us, err := json.Marshal(i)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum("Object to JSON failed!" + err.Error()))
+		em.LogError.Output(em.MessageWithLineNum("Object to JSON failed!" + err.Error()))
 		return Role{}, err
 	}
 	err = json.Unmarshal(us, &r)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum("JSON conversion object failed!" + err.Error()))
+		em.LogError.Output(em.MessageWithLineNum("JSON conversion object failed!" + err.Error()))
 		return Role{}, err
 	}
 	return r, nil
@@ -67,7 +67,7 @@ func (this *Role) getAll_NoCache() ([]Role, error) {
 	if em_library.Config.App.Cache {
 		b, err := json.Marshal(data)
 		if err != nil {
-			em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogError.Output(em.MessageWithLineNum(err.Error()))
 			return nil, err
 		}
 		em_library.Cache.SetString(application.Cache_RoleGetAll, string(b), 0)
@@ -87,7 +87,7 @@ func (this *Role) getAll_Cache() ([]Role, error) {
 	var roles []Role
 	err = json.Unmarshal([]byte(j), &roles)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		em_library.Cache.DeleteString(application.Cache_RoleGetAll)
 		return nil, err
 	}

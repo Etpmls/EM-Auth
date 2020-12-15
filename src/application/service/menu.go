@@ -7,7 +7,6 @@ import (
 	em "github.com/Etpmls/Etpmls-Micro"
 	"github.com/Etpmls/Etpmls-Micro/library"
 	em_protobuf "github.com/Etpmls/Etpmls-Micro/protobuf"
-	"github.com/Etpmls/Etpmls-Micro/utils"
 	"github.com/go-redis/redis/v8"
 	"google.golang.org/grpc/codes"
 	"io/ioutil"
@@ -35,7 +34,7 @@ func (this *ServiceMenu) getAll_Cache(ctx context.Context, request *em_protobuf.
 		if err == redis.Nil {
 			return this.getAll_NoCache(ctx, request)
 		}
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Get"), nil, em.LogError.OutputAndReturnError(em_utils.MessageWithLineNum(err.Error())))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Get"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
 	}
 
 	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), ctx_json)
@@ -43,7 +42,7 @@ func (this *ServiceMenu) getAll_Cache(ctx context.Context, request *em_protobuf.
 func (this *ServiceMenu) getAll_NoCache(ctx context.Context, request *em_protobuf.Empty) (*em_protobuf.Response, error) {
 	ctx_json, err := ioutil.ReadFile("./storage/menu/menu.json")
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Get"), nil, em.LogError.OutputAndReturnError(em_utils.MessageWithLineNum(err.Error())))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Get"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
 	}
 	// Save menu
 	// 储存菜单
@@ -62,9 +61,9 @@ type validate_MenuCreate struct {
 func (this *ServiceMenu) Create(ctx context.Context, request *protobuf.MenuCreate) (*em_protobuf.Response, error) {
 	// Validate
 	var vd validate_MenuCreate
-	err := em_utils.ChangeType(request, &vd)
+	err := em.ChangeType(request, &vd)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
 	}
 	err = em_library.Validator.ValidateStruct(vd)
@@ -76,8 +75,8 @@ func (this *ServiceMenu) Create(ctx context.Context, request *protobuf.MenuCreat
 	// 移动文件
 	err = os.Rename("storage/menu/menu.json", "storage/menu/menu.json.bak")
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, em.LogError.OutputAndReturnError(em_utils.MessageWithLineNum(err.Error())))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
 	}
 
 	// Write file
@@ -85,13 +84,13 @@ func (this *ServiceMenu) Create(ctx context.Context, request *protobuf.MenuCreat
 	var s = []byte(request.Menu)
 	err = ioutil.WriteFile("storage/menu/menu.json", s, 0666)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum("Failed to write menu file!" + err.Error()))
+		em.LogError.Output(em.MessageWithLineNum("Failed to write menu file!" + err.Error()))
 
 		// Restore history menu
 		// 还原历史菜单
 		err2 := os.Rename("storage/menu/menu.json.bak", "storage/menu/menu.json")
 		if err2 != nil {
-			em.LogError.Output(em_utils.MessageWithLineNum("Failed to restore the backup menu file!" + err2.Error()))
+			em.LogError.Output(em.MessageWithLineNum("Failed to restore the backup menu file!" + err2.Error()))
 		}
 
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)

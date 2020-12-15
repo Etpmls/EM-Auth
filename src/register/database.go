@@ -4,7 +4,7 @@ import (
 	"github.com/Etpmls/EM-Auth/src/application"
 	"github.com/Etpmls/EM-Auth/src/application/database"
 	em "github.com/Etpmls/Etpmls-Micro"
-	em_utils "github.com/Etpmls/Etpmls-Micro/utils"
+
 	"gorm.io/gorm"
 )
 
@@ -15,7 +15,7 @@ func InsertBasicDataToDatabase()  {
 		Remark: "System Administrator",
 	}
 	if err := em.DB.Debug().Create(&role).Error; err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 	}
 
 
@@ -30,7 +30,7 @@ func InsertBasicDataToDatabase()  {
 		},
 	}
 	if err := em.DB.Debug().Set("gorm:association_autoupdate", false).Set("gorm:association_autocreate", false).Create(&user).Error; err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 	}
 
 	// Create Permission
@@ -252,6 +252,6 @@ func InsertBasicDataToDatabase()  {
 
 	}
 	if err := em.DB.Debug().Set("gorm:association_autoupdate", false).Set("gorm:association_autocreate", false).Create(&permission).Error; err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 	}
 }

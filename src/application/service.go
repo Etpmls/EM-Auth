@@ -1,5 +1,10 @@
 package application
 
+
+const (
+	Version_Service = "1.1.0"
+)
+
 /*
 	User Service
 */
@@ -12,7 +17,7 @@ const (
 // Client Service name
 // 客户端服务名
 const (
-	Service_AttachmentService = "AttachmentService"
+	Service_Attachment = "em_AttachmentRpcService"
 )
 
 // Relationship name
@@ -30,3 +35,9 @@ var (
 	Cache_UserGetAll = "UserGetAll"
 	Cache_RoleGetAll = "RoleGetAll"
 )
+
+// Route
+var NoAuthRoute = []string{
+	"/api/auth/*/user/login",
+	"/api/auth/*/user/getCurrent",
+}

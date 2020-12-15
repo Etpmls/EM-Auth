@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Etpmls/EM-Auth/src/application"
 	"github.com/Etpmls/EM-Auth/src/application/database"
 	"github.com/Etpmls/EM-Auth/src/register"
 	"github.com/Etpmls/Etpmls-Micro"
@@ -9,6 +10,7 @@ import (
 
 func main() {
 	var reg = em.Register{
+		Version_Service: 		map[string]string{"EM-Auth Version": application.Version_Service},
 		GrpcServiceFunc:    	register.RegisterRpcService,
 		GrpcMiddleware:     	register.RegisterGrpcMiddleware,
 		HttpServiceFunc:    	register.RegisterHttpService,
@@ -20,6 +22,6 @@ func main() {
 		},
 		InsertDatabaseInitialData: []func(){register.InsertBasicDataToDatabase},
 	}
-
+	reg.Init()
 	reg.Run()
 }

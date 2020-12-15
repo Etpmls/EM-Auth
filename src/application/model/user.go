@@ -7,7 +7,7 @@ import (
 	"github.com/Etpmls/EM-Auth/src/application"
 	em "github.com/Etpmls/Etpmls-Micro"
 	"github.com/Etpmls/Etpmls-Micro/library"
-	"github.com/Etpmls/Etpmls-Micro/utils"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-redis/redis/v8"
 	"golang.org/x/crypto/bcrypt"
@@ -54,20 +54,20 @@ func (this *User) GetUserByToken(token string) (u User, err error) {
 	// 从Token获取ID
 	id, err := em_library.JwtToken.GetIdByToken(token)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return u, err
 	}
 	// 从Token获取username
 	username, err  := em_library.JwtToken.GetIssuerByToken(token)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return u, err
 	}
 	// 获取用户
 	var data User
 	result := em.DB.Where("id = ? AND username = ?", id, username).First(&data)
 	if !(result.RowsAffected > 0) {
-		return u, em.LogError.OutputAndReturnError(em_utils.MessageWithLineNum("The current user was not found in the database!"))
+		return u, em.LogError.OutputAndReturnError(em.MessageWithLineNum("The current user was not found in the database!"))
 	}
 
 	return data, nil
@@ -79,7 +79,7 @@ func (this *User) GetUserIdByToken(token string) (id uint, err error) {
 	// 从Token获取ID
 	id, err = em_library.JwtToken.GetIdByToken(token)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return 0, err
 	}
 
@@ -89,7 +89,7 @@ func (this *User) GetUserIdByToken(token string) (id uint, err error) {
 // Obtain user id based on Request
 // 根据Request获取用户id
 func (this *User) GetUserIdByRequest(ctx context.Context) (id uint, err error) {
-	token, err := em.NewAuth().GetTokenFromCtx(ctx)
+	token, err := em.Micro.Auth.GetTokenFromCtx(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -98,7 +98,7 @@ func (this *User) GetUserIdByRequest(ctx context.Context) (id uint, err error) {
 	// 从Token获取ID
 	id, err = em_library.JwtToken.GetIdByToken(token)
 	if err != nil {
-		return 0, em.LogError.OutputAndReturnError(em_utils.MessageWithLineNum(err.Error()))
+		return 0, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error()))
 	}
 
 	return id, nil
@@ -111,14 +111,14 @@ func (this *User) Verify(username string, password string) (u User, err error) {
 	var user User
 	em.DB.Where("username = ?", username).First(&user)
 	if !(user.ID > 0) {
-		em.LogError.Output(em_utils.MessageWithLineNum("The username does not exist! Username:" + username))
+		em.LogError.Output(em.MessageWithLineNum("The username does not exist! Username:" + username))
 		return u, errors.New("The username does not exist!")
 	}
 
 	//Password is wrong
 	b, err := this.VerifyPassword(password, user.Password)
 	if err != nil || !b {
-		em.LogInfo.Output(em_utils.MessageWithLineNum("Verification failed or wrong password!"))
+		em.LogInfo.Output(em.MessageWithLineNum("Verification failed or wrong password!"))
 		return u, errors.New("Verification failed or wrong password!")
 	}
 
@@ -130,7 +130,7 @@ func (this *User) Verify(username string, password string) (u User, err error) {
 func (this *User) VerifyPassword(password, hash string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	if err != nil {
-		em.LogInfo.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogInfo.Output(em.MessageWithLineNum(err.Error()))
 		return false, err
 	}
 	return true, err
@@ -149,12 +149,12 @@ func (this *User) InterfaceToUser(i interface{}) (User, error) {
 	var u User
 	us, err := json.Marshal(i)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum("Object to JSON failed! err:" + err.Error()))
+		em.LogError.Output(em.MessageWithLineNum("Object to JSON failed! err:" + err.Error()))
 		return User{}, err
 	}
 	err = json.Unmarshal(us, &u)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum("JSON conversion object failed! err:" + err.Error()))
+		em.LogError.Output(em.MessageWithLineNum("JSON conversion object failed! err:" + err.Error()))
 		return User{}, err
 	}
 	return u, nil
@@ -166,12 +166,12 @@ func (this *User) InterfaceToUserGetOne(i interface{}) (UserGetOne, error) {
 	var u UserGetOne
 	us, err := json.Marshal(i)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum("Object to JSON failed! err:" + err.Error()))
+		em.LogError.Output(em.MessageWithLineNum("Object to JSON failed! err:" + err.Error()))
 		return UserGetOne{}, err
 	}
 	err = json.Unmarshal(us, &u)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum("JSON conversion object failed! err:" + err.Error()))
+		em.LogError.Output(em.MessageWithLineNum("JSON conversion object failed! err:" + err.Error()))
 		return UserGetOne{}, err
 	}
 	return u, nil
@@ -194,7 +194,7 @@ func (this *User) getAll_NoCache() ([]User, error) {
 	if em_library.Config.App.Cache {
 		b, err := json.Marshal(data)
 		if err != nil {
-			em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+			em.LogError.Output(em.MessageWithLineNum(err.Error()))
 			return nil, err
 		}
 		em_library.Cache.SetString(application.Cache_UserGetAll, string(b), 0)
@@ -214,7 +214,7 @@ func (this *User) getAll_Cache() ([]User, error) {
 	var users []User
 	err = json.Unmarshal([]byte(j), &users)
 	if err != nil {
-		em.LogError.Output(em_utils.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		em_library.Cache.DeleteString(application.Cache_UserGetAll)
 		return nil, err
 	}

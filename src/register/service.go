@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/Etpmls/EM-Auth/src/application/protobuf"
 	"github.com/Etpmls/EM-Auth/src/application/service"
-	em_protobuf "github.com/Etpmls/Etpmls-Micro/protobuf"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 )
@@ -17,7 +16,6 @@ func RegisterRpcService(s *grpc.Server)  {
 	protobuf.RegisterMenuServer(s, &service.ServiceMenu{})
 	protobuf.RegisterPermissionServer(s, &service.ServicePermission{})
 	protobuf.RegisterSettingServer(s, &service.ServiceSetting{})
-	em_protobuf.RegisterAuthServer(s, &service.ServiceAuth{})
 	return
 }
 
