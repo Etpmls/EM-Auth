@@ -38,6 +38,8 @@ github.com/Etpmls/Etpmls-Micro v1.0.1 h1:HewL3qmMpGxfOYeh6YrACq/QzkbnKFTjG6oCx/u
 github.com/Etpmls/Etpmls-Micro v1.0.1/go.mod h1:hzH0HpQ3fOqvvyc+UCZA7p9pTcjQ9Dl9EI+Uz/qjrN8=
 github.com/Etpmls/Etpmls-Micro v1.0.2 h1:hJ/EnocPBoHN7ffaQrKxZm/gn1TByDeDy6Y5O6U059E=
 github.com/Etpmls/Etpmls-Micro v1.0.2/go.mod h1:hzH0HpQ3fOqvvyc+UCZA7p9pTcjQ9Dl9EI+Uz/qjrN8=
+github.com/Etpmls/Etpmls-Micro v1.1.1 h1:ZF4QAvpSEFh4mPlbfEkNH1aPwtpUYdA4xpg+EM09VZY=
+github.com/Etpmls/Etpmls-Micro v1.1.1/go.mod h1:hzH0HpQ3fOqvvyc+UCZA7p9pTcjQ9Dl9EI+Uz/qjrN8=
 github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5 h1:rFw4nCn9iMW+Vajsk51NtYIcwSTkXr+JGrMd36kTDJw=
 github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5/go.mod h1:SkGFH1ia65gfNATL8TAiHDNxPzPdmEL5uirI2Uyuz6c=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
