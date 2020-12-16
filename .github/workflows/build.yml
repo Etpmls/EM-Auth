@@ -26,6 +26,7 @@ jobs:
           rm storage/config/app.yaml.example
           rm storage/config/.gitignore
           rm storage/menu/.gitignore
+          mv storage/menu/menu.json.example storage/menu/menu.json
 
       - name: Build normal
         run: |
