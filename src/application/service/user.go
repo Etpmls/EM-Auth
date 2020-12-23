@@ -29,7 +29,7 @@ func (this *ServiceUser) Register(ctx context.Context, request *protobuf.UserReg
 	return &em_protobuf.Response{
 		Code:    em.SUCCESS_Code,
 		Status:  em.SUCCESS_Status,
-		Message: em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_RegistrationClosed"),
+		Message: em.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_RegistrationClosed"),
 	}, nil
 }
 
@@ -44,10 +44,10 @@ func (this *ServiceUser) Login(ctx context.Context, request *protobuf.UserLogin)
 	// Validate
 	{
 		var vd validate_UserLogin
-		err := em_library.Validator.Validate(request, &vd)
+		err := em.Validator.Validate(request, &vd)
 		if err != nil {
 			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
-			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
+			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
 
@@ -56,34 +56,34 @@ func (this *ServiceUser) Login(ctx context.Context, request *protobuf.UserLogin)
 	usr, err := us.Verify(request.Username, request.Password)
 	if err != nil {
 		em.LogInfo.Output(em.MessageWithLineNum("Verify user failed!"))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Login"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Login"), nil, err)
 	}
 
 	//JWT
 	token, err := us.UserGetToken(usr.ID, usr.Username)
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum("Get Token failed! Error:" + err.Error()))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Login"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Login"), nil, err)
 	}
 
 	//Return Token
 	resData := make(map[string]string)
 	resData["token"] = token
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Login"), resData)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Login"), resData)
 }
 
 
 // User Logout
 // 用户登出
 func (this *ServiceUser) Logout(ctx context.Context, request *em_protobuf.Empty) (*em_protobuf.Response, error) {
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Logout"), nil)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Logout"), nil)
 }
 
 // Get current user
 // 获取当前用户
 func (this *ServiceUser) GetCurrent(ctx context.Context, request *protobuf.UserGetCurrent) (*em_protobuf.Response, error) {
-	if em_library.Config.App.Cache {
+	if em_library.Config.App.EnableCache {
 		return this.getCurrent_Cache(ctx, request)
 	} else {
 		return this.getCurrent_NoCache(ctx, request)
@@ -94,13 +94,13 @@ func (this *ServiceUser) getCurrent_NoCache(ctx context.Context, request *protob
 	var user model.User
 	u, err := user.GetUserByToken(request.Token)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, err)
 	}
 
 	// Filter some field
 	filter_user, err := user.InterfaceToUserGetOne(u)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
 	}
 
 	// Ignore the avatar tag in the User structure
@@ -125,32 +125,32 @@ func (this *ServiceUser) getCurrent_NoCache(ctx context.Context, request *protob
 		userApi.Roles = append(userApi.Roles, v.Name)
 	}
 
-	if em_library.Config.App.Cache {
+	if em_library.Config.App.EnableCache {
 		b, err := json.Marshal(userApi)
 		if err != nil {
 			em.LogError.Output(err)
 		} else {
 			var m = make(map[string]string)
 			m[strconv.Itoa(int(u.ID))] = string(b)
-			em_library.Cache.SetHash(application.Cache_UserGetCurrent, m)
+			em.Cache.SetHash(application.Cache_UserGetCurrent, m)
 		}
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_GetUser"), userApi)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_GetUser"), userApi)
 }
 func (this *ServiceUser) getCurrent_Cache(ctx context.Context, request *protobuf.UserGetCurrent) (*em_protobuf.Response, error) {
 	var user model.User
 	id, err := user.GetUserIdByToken(request.Token)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
 	}
 
-	str, err := em_library.Cache.GetHash(application.Cache_UserGetCurrent, strconv.Itoa(int(id)))
+	str, err := em.Cache.GetHash(application.Cache_UserGetCurrent, strconv.Itoa(int(id)))
 	if err != nil {
 		if err == redis.Nil {
 			return this.getCurrent_NoCache(ctx, request)
 		}
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
 	}
 
 	type tmp struct {
@@ -162,10 +162,10 @@ func (this *ServiceUser) getCurrent_Cache(ctx context.Context, request *protobuf
 	err = json.Unmarshal([]byte(str), &userApi)
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
-		em_library.Cache.DeleteHash(application.Cache_UserGetCurrent, strconv.Itoa(int(id)))
+		em.Cache.DeleteHash(application.Cache_UserGetCurrent, strconv.Itoa(int(id)))
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_GetUser"), userApi)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_GetUser"), userApi)
 }
 
 // Get all user
@@ -189,9 +189,9 @@ func (this *ServiceUser) GetAll(ctx context.Context, request *em_protobuf.Pagina
 
 	em.DB.Model(&User{}).Preload("Roles").Where("username " +em.FUZZY_SEARCH+ " ?", "%"+ search +"%").Count(&count).Limit(limit).Offset(offset).Find(&data)
 
-	m := map[string]interface{}{"data": data, em_library.Config.Field.Pagination.Count: count}
+	m := map[string]interface{}{"data": data, application.ServiceConfig.Field.Pagination.Count: count}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), m)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), m)
 }
 
 // Create user
@@ -204,10 +204,10 @@ func (this *ServiceUser) Create(ctx context.Context, request *protobuf.UserCreat
 	// Validate
 	{
 		var vd validate_UserCreate
-		err := em_library.Validator.Validate(request, &vd)
+		err := em.Validator.Validate(request, &vd)
 		if err != nil {
 			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
-			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
+			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
 
@@ -215,7 +215,7 @@ func (this *ServiceUser) Create(ctx context.Context, request *protobuf.UserCreat
 	var user model.User
 	u, err := user.InterfaceToUser(request)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
 	}
 
 	// Check if Username exists
@@ -224,7 +224,7 @@ func (this *ServiceUser) Create(ctx context.Context, request *protobuf.UserCreat
 	em.DB.Model(&model.User{}).Where("username = ?", u.Username).Count(&count_username)
 	if count_username != 0 {
 		em.LogInfo.Output(em.MessageWithLineNum("Username already exists"))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_DuplicateUserName"), nil, errors.New("Username already exists"))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_DuplicateUserName"), nil, errors.New("Username already exists"))
 	}
 
 	// Check if the role exists
@@ -237,7 +237,7 @@ func (this *ServiceUser) Create(ctx context.Context, request *protobuf.UserCreat
 	em.DB.Model(&model.Role{}).Where("id IN ?", role_ids).Count(&count)
 	if int(count) != len(role_ids) {
 		em.LogError.Output(em.MessageWithLineNum("Role does not exist"))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, errors.New("Role does not exist"))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, errors.New("Role does not exist"))
 	}
 
 	// Create User
@@ -258,13 +258,13 @@ func (this *ServiceUser) Create(ctx context.Context, request *protobuf.UserCreat
 		return nil
 	})
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
 	}
 
 	// Delete Cache
 	// 删除缓存
-	if em_library.Config.App.Cache {
-		em_library.Cache.DeleteString(application.Cache_UserGetAll)
+	if em_library.Config.App.EnableCache {
+		em.Cache.DeleteString(application.Cache_UserGetAll)
 	}
 
 	data, err := user.InterfaceToUserGetOne(u)
@@ -273,7 +273,7 @@ func (this *ServiceUser) Create(ctx context.Context, request *protobuf.UserCreat
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Create"), data)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Create"), data)
 }
 
 // Edit user
@@ -289,9 +289,9 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 	err := em.ChangeType(request, &vd)
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
 	}
-	err = em_library.Validator.ValidateStruct(vd)
+	err = em.Validator.ValidateStruct(vd)
 	if err != nil {
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, err.Error(), nil, err)
 	}
@@ -300,7 +300,7 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 	var user model.User
 	u, err := user.InterfaceToUser(request)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
 	}
 
 	// Find if the user exists
@@ -309,7 +309,7 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 	result := em.DB.First(&form, request.Id)
 	if result.RowsAffected == 0 {
 		em.LogWarn.Output(em.MessageWithLineNum("No user record"))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, errors.New("No user record"))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, errors.New("No user record"))
 	}
 
 	// Check if Username exists
@@ -318,7 +318,7 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 	em.DB.Model(&model.User{}).Where("username = ?", u.Username).Not(request.Id).Count(&count_username)
 	if count_username != 0 {
 		em.LogDebug.Output(em.MessageWithLineNum("The user name already exists!"))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_DuplicateUserName"), nil, errors.New("Username already exists"))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_DuplicateUserName"), nil, errors.New("Username already exists"))
 	}
 
 	// Check if the role exists
@@ -331,7 +331,7 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 	em.DB.Model(&model.Role{}).Where("id IN ?", role_ids).Count(&count)
 	if int(count) != len(role_ids) {
 		em.LogWarn.Output(em.MessageWithLineNum("Role does not exist"))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, errors.New("Role does not exist"))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, errors.New("Role does not exist"))
 	}
 
 	// If user set new password
@@ -340,7 +340,7 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 		u.Password, err = user.BcryptPassword(u.Password)
 		if err != nil {
 			em.LogError.Output(em.MessageWithLineNum(err.Error()))
-			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
+			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
 		}
 	}
 
@@ -368,14 +368,14 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 		return nil
 	})
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
 	}
 
 	// Delete Cache
 	// 删除缓存
-	if em_library.Config.App.Cache {
-		em_library.Cache.DeleteString(application.Cache_UserGetAll)
-		em_library.Cache.DeleteHash(application.Cache_UserGetCurrent, strconv.Itoa(int(request.Id)))
+	if em_library.Config.App.EnableCache {
+		em.Cache.DeleteString(application.Cache_UserGetAll)
+		em.Cache.DeleteHash(application.Cache_UserGetCurrent, strconv.Itoa(int(request.Id)))
 	}
 
 	data, err := user.InterfaceToUserGetOne(u)
@@ -384,7 +384,7 @@ func (this *ServiceUser) Edit(ctx context.Context, request *protobuf.UserEdit) (
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Edit"), data)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Edit"), data)
 }
 
 // Delete user
@@ -398,9 +398,9 @@ func (this *ServiceUser) Delete(ctx context.Context, request *protobuf.UserDelet
 	err := em.ChangeType(request, &vd)
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Delete"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Delete"), nil, err)
 	}
-	err = em_library.Validator.ValidateStruct(vd)
+	err = em.Validator.ValidateStruct(vd)
 	if err != nil {
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, err.Error(), nil, err)
 	}
@@ -415,7 +415,7 @@ func (this *ServiceUser) Delete(ctx context.Context, request *protobuf.UserDelet
 	b := em.CheckIfSliceContainsInt(1, ids)
 	if b {
 		em.LogWarn.Output(em.MessageWithLineNum("Cannot delete administrator"))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_ProhibitOperationOfAdministratorUsers"), nil, errors.New("Cannot delete administrator"))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_ProhibitOperationOfAdministratorUsers"), nil, errors.New("Cannot delete administrator"))
 	}
 
 	err = em.DB.Transaction(func(tx *gorm.DB) error {
@@ -439,21 +439,21 @@ func (this *ServiceUser) Delete(ctx context.Context, request *protobuf.UserDelet
 		return nil
 	})
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Delete"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Delete"), nil, err)
 	}
 
 	// Delete Cache
 	// 删除缓存
-	if em_library.Config.App.Cache {
-		em_library.Cache.DeleteString(application.Cache_UserGetAll)
+	if em_library.Config.App.EnableCache {
+		em.Cache.DeleteString(application.Cache_UserGetAll)
 		var tmp []string
 		for _, v := range ids {
 			tmp = append(tmp, strconv.Itoa(int(v)))
 		}
-		em_library.Cache.DeleteHash(application.Cache_UserGetCurrent, strings.Join(tmp, " "))
+		em.Cache.DeleteHash(application.Cache_UserGetCurrent, strings.Join(tmp, " "))
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Delete"), nil)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Delete"), nil)
 }
 
 // Update user information
@@ -465,10 +465,10 @@ type validate_UserUpdateInformation struct {
 func (this *ServiceUser) UpdateInformation(ctx context.Context, request *protobuf.UserUpdateInformation) (*em_protobuf.Response, error) {
 	// Validate
 	{
-		err := em_library.Validator.Validate(request, &validate_UserUpdateInformation{})
+		err := em.Validator.Validate(request, &validate_UserUpdateInformation{})
 		if err != nil {
 			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
-			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
+			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
 
@@ -476,13 +476,13 @@ func (this *ServiceUser) UpdateInformation(ctx context.Context, request *protobu
 	var user model.User
 	id, err := user.GetUserIdByRequest(ctx)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Update"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Update"), nil, err)
 	}
 
 	// Request -> User
 	u, err := user.InterfaceToUser(request)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Update"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Update"), nil, err)
 	}
 
 	// Update
@@ -508,13 +508,13 @@ func (this *ServiceUser) UpdateInformation(ctx context.Context, request *protobu
 		return nil
 	})
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Update"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Update"), nil, err)
 	}
 
-	if em_library.Config.App.Cache {
-		em_library.Cache.DeleteString(application.Cache_UserGetAll)
-		em_library.Cache.DeleteHash(application.Cache_UserGetCurrent, strconv.Itoa(int(id)))
+	if em_library.Config.App.EnableCache {
+		em.Cache.DeleteString(application.Cache_UserGetAll)
+		em.Cache.DeleteHash(application.Cache_UserGetCurrent, strconv.Itoa(int(id)))
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Update"), nil)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Update"), nil)
 }

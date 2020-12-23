@@ -1,0 +1,7 @@
+service:
+  captcha: true
+field:
+  pagination:
+    number: page_number
+    size: page_size
+    count: page_count

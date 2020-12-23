@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/Etpmls/EM-Auth/src/application/protobuf"
 	em "github.com/Etpmls/Etpmls-Micro"
-	em_library "github.com/Etpmls/Etpmls-Micro/library"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -28,12 +27,12 @@ func (this *middleware) Auth() grpc.UnaryServerInterceptor {
 		// Get token from header
 		token, err:= em.Micro.Auth.Rpc_GetTokenFromHeader(ctx)
 		if err != nil || token == "" {
-			return nil, status.Error(codes.PermissionDenied, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_PermissionDenied"))
+			return nil, status.Error(codes.PermissionDenied, em.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_PermissionDenied"))
 		}
 
 		b, _ := em.Micro.Auth.VerifyToken(token)
 		if !b {
-			return nil, status.Error(codes.PermissionDenied, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_PermissionDenied"))
+			return nil, status.Error(codes.PermissionDenied, em.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_PermissionDenied"))
 		}
 
 		// Pass the token to the method

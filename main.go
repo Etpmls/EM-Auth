@@ -21,6 +21,11 @@ func main() {
 			&database.Permission{},
 		},
 		InsertDatabaseInitialData: []func(){register.InsertBasicDataToDatabase},
+		CustomConfiguration: struct {
+			Path       string
+			DebugPath  string
+			StructAddr interface{}
+		}{Path: "storage/config/auth.yaml", DebugPath: "storage/config/auth_debug.yaml", StructAddr: &application.ServiceConfig},
 	}
 	reg.Init()
 	reg.Run()

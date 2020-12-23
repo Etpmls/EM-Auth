@@ -24,6 +24,9 @@ jobs:
           cp storage/config/app.yaml.example storage/config/app.yaml
           cp storage/config/app.yaml.example storage/config/app_debug.yaml
           rm storage/config/app.yaml.example
+          cp storage/config/auth.yaml.example storage/config/auth.yaml
+          cp storage/config/auth.yaml.example storage/config/auth_debug.yaml
+          rm storage/config/auth.yaml.example
           rm storage/config/.gitignore
           rm storage/menu/.gitignore
           mv storage/menu/menu.json.example storage/menu/menu.json

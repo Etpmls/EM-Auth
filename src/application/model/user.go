@@ -41,7 +41,7 @@ type UserGetOne struct {
 // Get token by ID&username
 // 通过ID&用户名获取Token
 func (this *User) UserGetToken(userId uint, username string) (string, error) {
-	return em_library.JwtToken.CreateToken(&jwt.StandardClaims{
+	return em.JwtToken.CreateToken(&jwt.StandardClaims{
 		Id: strconv.Itoa(int(userId)),                                                          // 用户ID
 		ExpiresAt: time.Now().Add(time.Second * em_library.Config.App.TokenExpirationTime).Unix(), // 过期时间 - 12个小时
 		Issuer:    username,                                                                    // 发行者
@@ -52,13 +52,13 @@ func (this *User) UserGetToken(userId uint, username string) (string, error) {
 // 根据token获取用户
 func (this *User) GetUserByToken(token string) (u User, err error) {
 	// 从Token获取ID
-	id, err := em_library.JwtToken.GetIdByToken(token)
+	id, err := em.JwtToken.GetIdByToken(token)
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return u, err
 	}
 	// 从Token获取username
-	username, err  := em_library.JwtToken.GetIssuerByToken(token)
+	username, err  := em.JwtToken.GetIssuerByToken(token)
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return u, err
@@ -77,7 +77,7 @@ func (this *User) GetUserByToken(token string) (u User, err error) {
 // 根据token获取用户id
 func (this *User) GetUserIdByToken(token string) (id uint, err error) {
 	// 从Token获取ID
-	id, err = em_library.JwtToken.GetIdByToken(token)
+	id, err = em.JwtToken.GetIdByToken(token)
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return 0, err
@@ -96,7 +96,7 @@ func (this *User) GetUserIdByRequest(ctx context.Context) (id uint, err error) {
 
 	// Get ID from Token
 	// 从Token获取ID
-	id, err = em_library.JwtToken.GetIdByToken(token)
+	id, err = em.JwtToken.GetIdByToken(token)
 	if err != nil {
 		return 0, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error()))
 	}
@@ -180,7 +180,7 @@ func (this *User) InterfaceToUserGetOne(i interface{}) (UserGetOne, error) {
 // Get all Users
 // 获取全部用户
 func (this *User) GetAll() ([]User, error) {
-	if em_library.Config.App.Cache {
+	if em_library.Config.App.EnableCache {
 		return this.getAll_Cache()
 	} else {
 		return this.getAll_NoCache()
@@ -191,19 +191,19 @@ func (this *User) getAll_NoCache() ([]User, error) {
 
 	em.DB.Find(&data)
 
-	if em_library.Config.App.Cache {
+	if em_library.Config.App.EnableCache {
 		b, err := json.Marshal(data)
 		if err != nil {
 			em.LogError.Output(em.MessageWithLineNum(err.Error()))
 			return nil, err
 		}
-		em_library.Cache.SetString(application.Cache_UserGetAll, string(b), 0)
+		em.Cache.SetString(application.Cache_UserGetAll, string(b), 0)
 	}
 
 	return data, nil
 }
 func (this *User) getAll_Cache() ([]User, error) {
-	j, err := em_library.Cache.GetString(application.Cache_UserGetAll)
+	j, err := em.Cache.GetString(application.Cache_UserGetAll)
 	if err != nil {
 		if err == redis.Nil {
 			return this.getAll_NoCache()
@@ -215,7 +215,7 @@ func (this *User) getAll_Cache() ([]User, error) {
 	err = json.Unmarshal([]byte(j), &users)
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
-		em_library.Cache.DeleteString(application.Cache_UserGetAll)
+		em.Cache.DeleteString(application.Cache_UserGetAll)
 		return nil, err
 	}
 

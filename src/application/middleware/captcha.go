@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"github.com/Etpmls/EM-Auth/src/application"
 	"github.com/Etpmls/EM-Auth/src/application/protobuf"
 	em "github.com/Etpmls/Etpmls-Micro"
 	em_library "github.com/Etpmls/Etpmls-Micro/library"
@@ -22,17 +23,17 @@ func (this *middleware) Captcha() grpc.UnaryServerInterceptor {
 
 		// If the verification code function is not turned on
 		// 如果未开启验证码功能
-		if em_library.Config.App.Captcha == false {
+		if application.ServiceConfig.Service.Captcha == false {
 			return handler(ctx, req)
 		}
 
 		// Verify captcha
 		// 验证码验证
-		ok2 := em_library.Captcha.Verify(em_library.Config.Captcha.Secret, v.Captcha)
+		ok2 := em.Captcha.Verify(em_library.Config.Captcha.Secret, v.Captcha)
 		if ok2 {
 			return handler(ctx, req)
 		}
 
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_CaptchaVerificationFailed"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_CaptchaVerificationFailed"), nil, err)
 	}
 }

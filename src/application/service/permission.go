@@ -35,7 +35,7 @@ func (this *ServicePermission) GetAll(ctx context.Context, request *em_protobuf.
 
 	em.DB.Model(&Permission{}).Where("name " + em.FUZZY_SEARCH + " ?", "%"+ search +"%").Count(&count).Limit(limit).Offset(offset).Find(&data)
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), map[string]interface{}{"data": data, em_library.Config.Field.Pagination.Count: count})
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), map[string]interface{}{"data": data, application.ServiceConfig.Field.Pagination.Count: count})
 }
 
 // Create Permission
@@ -50,10 +50,10 @@ type validate_PermissionCreate struct {
 func (this *ServicePermission) Create(ctx context.Context, request *protobuf.PermissionCreate) (*em_protobuf.Response, error) {
 	// Validate
 	{
-		err := em_library.Validator.Validate(request, &validate_PermissionCreate{})
+		err := em.Validator.Validate(request, &validate_PermissionCreate{})
 		if err != nil {
 			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
-			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
+			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
 
@@ -61,7 +61,7 @@ func (this *ServicePermission) Create(ctx context.Context, request *protobuf.Per
 	var permission model.Permission
 	p, err := permission.InterfaceToPermission(request)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
 	}
 	
 	// Create
@@ -77,14 +77,14 @@ func (this *ServicePermission) Create(ctx context.Context, request *protobuf.Per
 	})
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
 	}
 
-	if em_library.Config.App.Cache {
-		em_library.Cache.DeleteString(application.Cache_PermissionGetAll)
+	if em_library.Config.App.EnableCache {
+		em.Cache.DeleteString(application.Cache_PermissionGetAll)
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Create"), nil)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Create"), nil)
 }
 
 // Edit Permission
@@ -96,10 +96,10 @@ type validate_PermissionEdit struct {
 func (this *ServicePermission) Edit(ctx context.Context, request *protobuf.PermissionEdit) (*em_protobuf.Response, error) {
 	// Validate
 	{
-		err := em_library.Validator.Validate(request, &validate_PermissionEdit{})
+		err := em.Validator.Validate(request, &validate_PermissionEdit{})
 		if err != nil {
 			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
-			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
+			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
 
@@ -107,7 +107,7 @@ func (this *ServicePermission) Edit(ctx context.Context, request *protobuf.Permi
 	var permission model.Permission
 	p, err := permission.InterfaceToPermission(request)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
 	}
 
 	err = em.DB.Transaction(func(tx *gorm.DB) error {
@@ -124,14 +124,14 @@ func (this *ServicePermission) Edit(ctx context.Context, request *protobuf.Permi
 	})
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
 	}
 
-	if em_library.Config.App.Cache {
-		em_library.Cache.DeleteString(application.Cache_PermissionGetAll)
+	if em_library.Config.App.EnableCache {
+		em.Cache.DeleteString(application.Cache_PermissionGetAll)
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Edit"), nil)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Edit"), nil)
 }
 
 // Delete Permission
@@ -142,10 +142,10 @@ type validate_PermissionDelete struct {
 func (this *ServicePermission) Delete(ctx context.Context, request *protobuf.PermissionDelete) (*em_protobuf.Response, error) {
 	// Validate
 	{
-		err := em_library.Validator.Validate(request, &validate_PermissionDelete{})
+		err := em.Validator.Validate(request, &validate_PermissionDelete{})
 		if err != nil {
 			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
-			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
+			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
 
@@ -176,14 +176,14 @@ func (this *ServicePermission) Delete(ctx context.Context, request *protobuf.Per
 	})
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Delete"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Delete"), nil, err)
 	}
 
-	if em_library.Config.App.Cache {
-		em_library.Cache.DeleteString(application.Cache_PermissionGetAll)
+	if em_library.Config.App.EnableCache {
+		em.Cache.DeleteString(application.Cache_PermissionGetAll)
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Delete"), nil)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Delete"), nil)
 }
 
 // Get Advanced verify permissions
@@ -192,5 +192,5 @@ func (this *ServicePermission) GetAdvancedVerify(ctx context.Context, request *e
 	type Permission model.PermissionGetOne
 	var data []Permission
 	em.DB.Where("auth = ?", application.Auth_AdvancedVerify).Find(&data)
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), data)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), data)
 }

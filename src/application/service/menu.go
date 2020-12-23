@@ -20,7 +20,7 @@ type ServiceMenu struct {
 // Get all menu
 // 获取全部菜单
 func (this *ServiceMenu) GetAll(ctx context.Context, request *em_protobuf.Empty) (*em_protobuf.Response, error) {
-	if em_library.Config.App.Cache {
+	if em_library.Config.App.EnableCache {
 		return this.getAll_Cache(ctx, request)
 	} else {
 		return this.getAll_NoCache(ctx, request)
@@ -29,28 +29,28 @@ func (this *ServiceMenu) GetAll(ctx context.Context, request *em_protobuf.Empty)
 func (this *ServiceMenu) getAll_Cache(ctx context.Context, request *em_protobuf.Empty) (*em_protobuf.Response, error) {
 	// Get the menu from cache
 	// 从缓存中获取menu
-	ctx_json, err := em_library.Cache.GetString(application.Cache_MenuGetAll)
+	ctx_json, err := em.Cache.GetString(application.Cache_MenuGetAll)
 	if err != nil {
 		if err == redis.Nil {
 			return this.getAll_NoCache(ctx, request)
 		}
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Get"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Get"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), ctx_json)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), ctx_json)
 }
 func (this *ServiceMenu) getAll_NoCache(ctx context.Context, request *em_protobuf.Empty) (*em_protobuf.Response, error) {
 	ctx_json, err := ioutil.ReadFile("./storage/menu/menu.json")
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Get"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Get"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
 	}
 	// Save menu
 	// 储存菜单
-	if em_library.Config.App.Cache {
-		em_library.Cache.SetString(application.Cache_MenuGetAll, string(ctx_json), 0)
+	if em_library.Config.App.EnableCache {
+		em.Cache.SetString(application.Cache_MenuGetAll, string(ctx_json), 0)
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), string(ctx_json))
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), string(ctx_json))
 }
 
 // Create Menu
@@ -64,9 +64,9 @@ func (this *ServiceMenu) Create(ctx context.Context, request *protobuf.MenuCreat
 	err := em.ChangeType(request, &vd)
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
 	}
-	err = em_library.Validator.ValidateStruct(vd)
+	err = em.Validator.ValidateStruct(vd)
 	if err != nil {
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, err.Error(), nil, err)
 	}
@@ -76,7 +76,7 @@ func (this *ServiceMenu) Create(ctx context.Context, request *protobuf.MenuCreat
 	err = os.Rename("storage/menu/menu.json", "storage/menu/menu.json.bak")
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
 	}
 
 	// Write file
@@ -93,14 +93,14 @@ func (this *ServiceMenu) Create(ctx context.Context, request *protobuf.MenuCreat
 			em.LogError.Output(em.MessageWithLineNum("Failed to restore the backup menu file!" + err2.Error()))
 		}
 
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
 	}
 
 	// Delete Cache
 	// 删除缓存
-	if em_library.Config.App.Cache {
-		em_library.Cache.DeleteString(application.Cache_MenuGetAll)
+	if em_library.Config.App.EnableCache {
+		em.Cache.DeleteString(application.Cache_MenuGetAll)
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Create"), nil)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Create"), nil)
 }

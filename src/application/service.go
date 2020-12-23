@@ -2,7 +2,7 @@ package application
 
 
 const (
-	Version_Service = "1.1.3"
+	Version_Service = "1.2.0"
 )
 
 /*
@@ -41,3 +41,21 @@ var NoAuthRoute = []string{
 	"/api/auth/*/user/login",
 	"/api/auth/*/user/getCurrent",
 }
+
+/*
+	Config
+*/
+type serviceConfiguration struct {
+	Service struct {
+		Captcha bool
+	}
+	Field struct{
+		Pagination struct {
+			Number string
+			Size string
+			Count string
+		}
+	}
+}
+
+var ServiceConfig serviceConfiguration

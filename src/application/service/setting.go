@@ -21,14 +21,14 @@ type ServiceSetting struct {
 func (this *ServiceSetting) CacheClear(ctx context.Context, request *em_protobuf.Empty) (*em_protobuf.Response, error) {
 	// If the cache is not turned on, return to the prompt
 	// 如果没开启缓存，返回提示
-	if !em_library.Config.App.Cache {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_CacheIsNotEnabled"), nil, errors.New("Cache Is Not Enabled!"))
+	if !em_library.Config.App.EnableCache {
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_CacheIsNotEnabled"), nil, errors.New("Cache Is Not Enabled!"))
 	}
 
-	em_library.Cache.ClearAllCache()
+	em.Cache.ClearAllCache()
 	em.LogDebug.Output(em.MessageWithLineNum("Cleared all cache!"))
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Clear"), nil)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Clear"), nil)
 }
 
 // Disk Cleanup
@@ -36,9 +36,9 @@ func (this *ServiceSetting) CacheClear(ctx context.Context, request *em_protobuf
 func (this *ServiceSetting) DiskCleanUp(ctx context.Context, request *em_protobuf.Empty) (*em_protobuf.Response, error) {
 	err := client.NewClient().Setting_DiskCleanUp(ctx)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Delete"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Delete"), nil, err)
 	}
 
 	em.LogDebug.Output(em.MessageWithLineNum("Disk cleanup complete!"))
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Clear"), nil)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Clear"), nil)
 }

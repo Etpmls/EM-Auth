@@ -4,8 +4,6 @@ import (
 	"github.com/Etpmls/EM-Auth/src/application"
 	"github.com/Etpmls/EM-Auth/src/application/model"
 	em "github.com/Etpmls/Etpmls-Micro"
-	em_library "github.com/Etpmls/Etpmls-Micro/library"
-
 	"net/http"
 )
 
@@ -36,7 +34,7 @@ func (this ServiceAuth) Check(w http.ResponseWriter, r *http.Request, pathParams
 	ps, err := permission.GetAll()
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
-		em.Micro.Response.Http_Error(w, http.StatusInternalServerError, em.ERROR_Code, em_library.I18n.TranslateString("ERROR_MESSAGE_GetPermission", lang), err)
+		em.Micro.Response.Http_Error(w, http.StatusInternalServerError, em.ERROR_Code, em.I18n.TranslateString("ERROR_MESSAGE_GetPermission", lang), err)
 		return
 	}
 

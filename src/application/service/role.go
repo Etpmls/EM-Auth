@@ -36,7 +36,7 @@ func (this *ServiceRole) GetAll(ctx context.Context, request *em_protobuf.Pagina
 
 	em.DB.Model(&Role{}).Preload("Permissions").Where("name " +em.FUZZY_SEARCH+ " ?", "%"+ search +"%").Count(&count).Limit(limit).Offset(offset).Find(&data)
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), map[string]interface{}{"data": data, em_library.Config.Field.Pagination.Count: count})
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Get"), map[string]interface{}{"data": data, application.ServiceConfig.Field.Pagination.Count: count})
 }
 
 // Create Role
@@ -49,10 +49,10 @@ type validate_RoleCreate struct {
 func (this *ServiceRole) Create(ctx context.Context, request *protobuf.RoleCreate) (*em_protobuf.Response, error) {
 	// Validate
 	{
-		err := em_library.Validator.Validate(request, &validate_RoleCreate{})
+		err := em.Validator.Validate(request, &validate_RoleCreate{})
 		if err != nil {
 			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
-			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
+			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
 
@@ -60,7 +60,7 @@ func (this *ServiceRole) Create(ctx context.Context, request *protobuf.RoleCreat
 	var role model.Role
 	r, err := role.InterfaceToRole(request)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
 	}
 
 	// Create
@@ -75,14 +75,14 @@ func (this *ServiceRole) Create(ctx context.Context, request *protobuf.RoleCreat
 		return nil
 	})
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Create"), nil, err)
 	}
 
-	if em_library.Config.App.Cache {
-		em_library.Cache.DeleteString(application.Cache_RoleGetAll)
+	if em_library.Config.App.EnableCache {
+		em.Cache.DeleteString(application.Cache_RoleGetAll)
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Create"), nil)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Create"), nil)
 }
 
 // Edit Role
@@ -94,10 +94,10 @@ type validate_RoleEdit struct {
 func (this *ServiceRole) Edit(ctx context.Context, request *protobuf.RoleEdit) (*em_protobuf.Response, error) {
 	// Validate
 	{
-		err := em_library.Validator.Validate(request, &validate_RoleEdit{})
+		err := em.Validator.Validate(request, &validate_RoleEdit{})
 		if err != nil {
 			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
-			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
+			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
 
@@ -105,7 +105,7 @@ func (this *ServiceRole) Edit(ctx context.Context, request *protobuf.RoleEdit) (
 	var role model.Role
 	r, err := role.InterfaceToRole(request)
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
 	}
 
 	err = em.DB.Transaction(func(tx *gorm.DB) error {
@@ -130,14 +130,14 @@ func (this *ServiceRole) Edit(ctx context.Context, request *protobuf.RoleEdit) (
 		return nil
 	})
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Edit"), nil, err)
 	}
 
-	if em_library.Config.App.Cache {
-		em_library.Cache.DeleteString(application.Cache_RoleGetAll)
+	if em_library.Config.App.EnableCache {
+		em.Cache.DeleteString(application.Cache_RoleGetAll)
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Edit"), nil)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Edit"), nil)
 }
 
 // Delete Role
@@ -148,10 +148,10 @@ type validate_RoleDelete struct {
 func (this *ServiceRole) Delete(ctx context.Context, request *protobuf.RoleDelete) (*em_protobuf.Response, error) {
 	// Validate
 	{
-		err := em_library.Validator.Validate(request, &validate_RoleDelete{})
+		err := em.Validator.Validate(request, &validate_RoleDelete{})
 		if err != nil {
 			em.LogWarn.Output(em.MessageWithLineNum(err.Error()))
-			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
+			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Validate"), nil, err)
 		}
 	}
 
@@ -189,12 +189,12 @@ func (this *ServiceRole) Delete(ctx context.Context, request *protobuf.RoleDelet
 		return nil
 	})
 	if err != nil {
-		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em_library.I18n.TranslateFromRequest(ctx, "ERROR_Delete"), nil, err)
+		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_Delete"), nil, err)
 	}
 
-	if em_library.Config.App.Cache {
-		em_library.Cache.DeleteString(application.Cache_RoleGetAll)
+	if em_library.Config.App.EnableCache {
+		em.Cache.DeleteString(application.Cache_RoleGetAll)
 	}
 
-	return em.SuccessRpc(em.SUCCESS_Code, em_library.I18n.TranslateFromRequest(ctx, "SUCCESS_Delete"), nil)
+	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Delete"), nil)
 }

@@ -53,7 +53,7 @@ func (this *Role) InterfaceToRole(i interface{}) (Role, error) {
 // Get all Roles
 // 获取全部角色
 func (this *Role) GetAll() ([]Role, error) {
-	if em_library.Config.App.Cache {
+	if em_library.Config.App.EnableCache {
 		return this.getAll_Cache()
 	} else {
 		return this.getAll_NoCache()
@@ -64,19 +64,19 @@ func (this *Role) getAll_NoCache() ([]Role, error) {
 
 	em.DB.Find(&data)
 
-	if em_library.Config.App.Cache {
+	if em_library.Config.App.EnableCache {
 		b, err := json.Marshal(data)
 		if err != nil {
 			em.LogError.Output(em.MessageWithLineNum(err.Error()))
 			return nil, err
 		}
-		em_library.Cache.SetString(application.Cache_RoleGetAll, string(b), 0)
+		em.Cache.SetString(application.Cache_RoleGetAll, string(b), 0)
 	}
 
 	return data, nil
 }
 func (this *Role) getAll_Cache() ([]Role, error) {
-	j, err := em_library.Cache.GetString(application.Cache_RoleGetAll)
+	j, err := em.Cache.GetString(application.Cache_RoleGetAll)
 	if err != nil {
 		if err == redis.Nil {
 			return this.getAll_NoCache()
@@ -88,7 +88,7 @@ func (this *Role) getAll_Cache() ([]Role, error) {
 	err = json.Unmarshal([]byte(j), &roles)
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
-		em_library.Cache.DeleteString(application.Cache_RoleGetAll)
+		em.Cache.DeleteString(application.Cache_RoleGetAll)
 		return nil, err
 	}
 

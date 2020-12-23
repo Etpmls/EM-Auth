@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/Etpmls/EM-Auth/src/application"
 	em "github.com/Etpmls/Etpmls-Micro"
-	em_library "github.com/Etpmls/Etpmls-Micro/library"
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"net/url"
@@ -34,35 +33,35 @@ func (this *Auth) NoVerify(w http.ResponseWriter) {
 
 func (this *Auth) BasicVerify(w http.ResponseWriter, token string, lang string) {
 	if len(token) == 0 {
-		em.Micro.Response.Http_Error(w, http.StatusUnauthorized, em.ERROR_Code, em_library.I18n.TranslateString("ERROR_MESSAGE_PermissionDenied", lang), errors.New("No token"))
+		em.Micro.Response.Http_Error(w, http.StatusUnauthorized, em.ERROR_Code, em.I18n.TranslateString("ERROR_MESSAGE_PermissionDenied", lang), errors.New("No token"))
 		return
 	}
 
 	b, err := em.Micro.Auth.VerifyToken(token)
 	if err != nil {
-		em.Micro.Response.Http_Error(w, http.StatusInternalServerError, em.ERROR_Code, em_library.I18n.TranslateString("ERROR_MESSAGE_TokenVerificationFailed", lang), err)
+		em.Micro.Response.Http_Error(w, http.StatusInternalServerError, em.ERROR_Code, em.I18n.TranslateString("ERROR_MESSAGE_TokenVerificationFailed", lang), err)
 		return
 	}
 	if !b {
-		em.Micro.Response.Http_Error(w, http.StatusUnauthorized, em.ERROR_Code, em_library.I18n.TranslateString("ERROR_MESSAGE_PermissionDenied", lang), err)
+		em.Micro.Response.Http_Error(w, http.StatusUnauthorized, em.ERROR_Code, em.I18n.TranslateString("ERROR_MESSAGE_PermissionDenied", lang), err)
 		return
 	}
 
-	em.Micro.Response.Http_Success(w, http.StatusOK, em.SUCCESS_Code, em_library.I18n.TranslateString("SUCCESS_Validate", lang), nil)
+	em.Micro.Response.Http_Success(w, http.StatusOK, em.SUCCESS_Code, em.I18n.TranslateString("SUCCESS_Validate", lang), nil)
 	return
 }
 
 func (this *Auth) AdvancedVerify(w http.ResponseWriter, token string, lang string, uri string, method string) {
 	// Get Claims
 	// 获取Claims
-	tmp, err := em_library.JwtToken.ParseToken(token)
+	tmp, err := em.JwtToken.ParseToken(token)
 	tk, ok := tmp.(*jwt.Token)
 	if err != nil {
-		em.Micro.Response.Http_Error(w, http.StatusInternalServerError, em.ERROR_Code, em_library.I18n.TranslateString("ERROR_MESSAGE_TokenVerificationFailed", lang), err)
+		em.Micro.Response.Http_Error(w, http.StatusInternalServerError, em.ERROR_Code, em.I18n.TranslateString("ERROR_MESSAGE_TokenVerificationFailed", lang), err)
 		return
 	}
 	if !ok {
-		em.Micro.Response.Http_Error(w, http.StatusBadRequest, em.ERROR_Code, em_library.I18n.TranslateString("ERROR_MESSAGE_TokenVerificationFailed", lang), err)
+		em.Micro.Response.Http_Error(w, http.StatusBadRequest, em.ERROR_Code, em.I18n.TranslateString("ERROR_MESSAGE_TokenVerificationFailed", lang), err)
 		return
 	}
 
@@ -72,13 +71,13 @@ func (this *Auth) AdvancedVerify(w http.ResponseWriter, token string, lang strin
 		if userId, ok := claims["jti"].(string); ok {
 			b, _ := this.PermissionVerify(uri, method, userId)
 			if b {
-				em.Micro.Response.Http_Success(w, http.StatusOK, em.SUCCESS_Code, em_library.I18n.TranslateString("SUCCESS_Validate", lang), nil)
+				em.Micro.Response.Http_Success(w, http.StatusOK, em.SUCCESS_Code, em.I18n.TranslateString("SUCCESS_Validate", lang), nil)
 				return
 			}
 		}
 	}
 
-	em.Micro.Response.Http_Error(w, http.StatusUnauthorized, em.ERROR_Code, em_library.I18n.TranslateString("ERROR_MESSAGE_PermissionDenied", lang), err)
+	em.Micro.Response.Http_Error(w, http.StatusUnauthorized, em.ERROR_Code, em.I18n.TranslateString("ERROR_MESSAGE_PermissionDenied", lang), err)
 	return
 }
 
