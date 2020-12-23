@@ -54,7 +54,7 @@ func (this *Auth) BasicVerify(w http.ResponseWriter, token string, lang string) 
 func (this *Auth) AdvancedVerify(w http.ResponseWriter, token string, lang string, uri string, method string) {
 	// Get Claims
 	// 获取Claims
-	tmp, err := em.JwtToken.ParseToken(token)
+	tmp, err := em.Micro.Auth.ParseToken(token)
 	tk, ok := tmp.(*jwt.Token)
 	if err != nil {
 		em.Micro.Response.Http_Error(w, http.StatusInternalServerError, em.ERROR_Code, em.I18n.TranslateString("ERROR_MESSAGE_TokenVerificationFailed", lang), err)

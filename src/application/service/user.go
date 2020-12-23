@@ -145,7 +145,7 @@ func (this *ServiceUser) getCurrent_Cache(ctx context.Context, request *protobuf
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_GetUser"), nil, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error())))
 	}
 
-	str, err := em.Cache.GetHash(application.Cache_UserGetCurrent, strconv.Itoa(int(id)))
+	str, err := em.Cache.GetHash(application.Cache_UserGetCurrent, strconv.Itoa(id))
 	if err != nil {
 		if err == redis.Nil {
 			return this.getCurrent_NoCache(ctx, request)
@@ -489,9 +489,11 @@ func (this *ServiceUser) UpdateInformation(ctx context.Context, request *protobu
 	err = em.DB.Transaction(func(tx *gorm.DB) error {
 
 		// Create avatar attachment
-		err := client.NewClient().User_CreateAvatar(ctx, request.GetAvatar().GetPath(), uint32(id), application.Relationship_User_Avatar)
-		if err != nil {
-			return err
+		if len(request.GetAvatar().GetPath()) > 0 {
+			err := client.NewClient().User_CreateAvatar(ctx, request.GetAvatar().GetPath(), uint32(id), application.Relationship_User_Avatar)
+			if err != nil {
+				return err
+			}
 		}
 
 		// Update password if exists
@@ -499,7 +501,7 @@ func (this *ServiceUser) UpdateInformation(ctx context.Context, request *protobu
 			u.Password, err = user.BcryptPassword(u.Password)
 		}
 
-		result := tx.Model(&model.User{ID: id}).Updates(&u)
+		result := tx.Model(&model.User{ID: uint(id)}).Updates(&u)
 		if result.Error != nil {
 			em.LogError.Output(em.MessageWithLineNum(result.Error.Error()))
 			return result.Error
@@ -513,7 +515,7 @@ func (this *ServiceUser) UpdateInformation(ctx context.Context, request *protobu
 
 	if em_library.Config.App.EnableCache {
 		em.Cache.DeleteString(application.Cache_UserGetAll)
-		em.Cache.DeleteHash(application.Cache_UserGetCurrent, strconv.Itoa(int(id)))
+		em.Cache.DeleteHash(application.Cache_UserGetCurrent, strconv.Itoa(id))
 	}
 
 	return em.SuccessRpc(em.SUCCESS_Code, em.I18n.TranslateFromRequest(ctx, "SUCCESS_Update"), nil)

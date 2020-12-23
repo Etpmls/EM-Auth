@@ -7,12 +7,9 @@ import (
 	"github.com/Etpmls/EM-Auth/src/application"
 	em "github.com/Etpmls/Etpmls-Micro"
 	"github.com/Etpmls/Etpmls-Micro/library"
-
-	"github.com/dgrijalva/jwt-go"
 	"github.com/go-redis/redis/v8"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"strconv"
 	"time"
 )
 
@@ -41,24 +38,20 @@ type UserGetOne struct {
 // Get token by ID&username
 // 通过ID&用户名获取Token
 func (this *User) UserGetToken(userId uint, username string) (string, error) {
-	return em.JwtToken.CreateToken(&jwt.StandardClaims{
-		Id: strconv.Itoa(int(userId)),                                                          // 用户ID
-		ExpiresAt: time.Now().Add(time.Second * em_library.Config.App.TokenExpirationTime).Unix(), // 过期时间 - 12个小时
-		Issuer:    username,                                                                    // 发行者
-	})
+	return em.Micro.Auth.CreateGeneralToken(int(userId), username)
 }
 
 // Get user by token
 // 根据token获取用户
 func (this *User) GetUserByToken(token string) (u User, err error) {
 	// 从Token获取ID
-	id, err := em.JwtToken.GetIdByToken(token)
+	id, err := em.Micro.Auth.GetIdByToken(token)
 	if err != nil {
-		em.LogError.Output(em.MessageWithLineNum(err.Error()))
+		em.LogError.Output(em.MessageWithLineNum_OneRecord(err.Error()))
 		return u, err
 	}
 	// 从Token获取username
-	username, err  := em.JwtToken.GetIssuerByToken(token)
+	username, err  := em.Micro.Auth.GetIssuerByToken(token)
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return u, err
@@ -75,9 +68,9 @@ func (this *User) GetUserByToken(token string) (u User, err error) {
 
 // Obtain user id based on token
 // 根据token获取用户id
-func (this *User) GetUserIdByToken(token string) (id uint, err error) {
+func (this *User) GetUserIdByToken(token string) (id int, err error) {
 	// 从Token获取ID
-	id, err = em.JwtToken.GetIdByToken(token)
+	id, err = em.Micro.Auth.GetIdByToken(token)
 	if err != nil {
 		em.LogError.Output(em.MessageWithLineNum(err.Error()))
 		return 0, err
@@ -88,7 +81,7 @@ func (this *User) GetUserIdByToken(token string) (id uint, err error) {
 
 // Obtain user id based on Request
 // 根据Request获取用户id
-func (this *User) GetUserIdByRequest(ctx context.Context) (id uint, err error) {
+func (this *User) GetUserIdByRequest(ctx context.Context) (id int, err error) {
 	token, err := em.Micro.Auth.GetTokenFromCtx(ctx)
 	if err != nil {
 		return 0, err
@@ -96,7 +89,7 @@ func (this *User) GetUserIdByRequest(ctx context.Context) (id uint, err error) {
 
 	// Get ID from Token
 	// 从Token获取ID
-	id, err = em.JwtToken.GetIdByToken(token)
+	id, err = em.Micro.Auth.GetIdByToken(token)
 	if err != nil {
 		return 0, em.LogError.OutputAndReturnError(em.MessageWithLineNum(err.Error()))
 	}

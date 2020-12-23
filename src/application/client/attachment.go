@@ -14,7 +14,7 @@ import (
 func (this *client) User_GetAvatar(token string, owner_id uint32, owner_type string) (string, error) {
 	// 1.Connect Service
 	cl := em.Micro.Client.NewClient()
-	err := cl.ConnectService(application.Service_Attachment)
+	err := cl.ConnectService(em.Micro.Config.ServiceDiscovery.Service.Prefix + application.Service_Attachment)
 	if err != nil {
 		return "", err
 	}
@@ -58,7 +58,7 @@ func (this *client) User_GetAvatar(token string, owner_id uint32, owner_type str
 func (this *client) User_CreateAvatar(ctx context.Context, path string, owner_id uint32, owner_type string) error {
 	// 1.Connect Service
 	cl := em.Micro.Client.NewClient()
-	err := cl.ConnectService(application.Service_Attachment)
+	err := cl.ConnectService(em.Micro.Config.ServiceDiscovery.Service.Prefix + application.Service_Attachment)
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func (this *client) User_CreateAvatar(ctx context.Context, path string, owner_id
 			OwnerType:     owner_type,
 		})
 		if err != nil {
-			em.LogError.Output(em.MessageWithLineNum(err.Error()))
+			em.LogError.Output(em.MessageWithLineNum_OneRecord(err.Error()))
 			return err
 		}
 
@@ -103,7 +103,7 @@ func (this *client) User_CreateAvatar(ctx context.Context, path string, owner_id
 func (this *client) Setting_DiskCleanUp(ctx context.Context) error {
 	// 1.Connect Service
 	cl := em.Micro.Client.NewClient()
-	err := cl.ConnectService(application.Service_Attachment)
+	err := cl.ConnectService(em.Micro.Config.ServiceDiscovery.Service.Prefix + application.Service_Attachment)
 	if err != nil {
 		return err
 	}
