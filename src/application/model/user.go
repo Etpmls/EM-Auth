@@ -111,7 +111,7 @@ func (this *User) Verify(username string, password string) (u User, err error) {
 	var user User
 	em.DB.Where("username = ?", username).First(&user)
 	if !(user.ID > 0) {
-		em.LogError.Output(em.MessageWithLineNum("The username does not exist! Username:" + username))
+		em.LogWarn.Output(em.MessageWithLineNum_OneRecord("The username does not exist! Username:" + username))
 		return u, errors.New("The username does not exist!")
 	}
 

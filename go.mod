@@ -3,7 +3,7 @@ module github.com/Etpmls/EM-Auth
 go 1.13
 
 require (
-	github.com/Etpmls/Etpmls-Micro v1.2.0
+	github.com/Etpmls/Etpmls-Micro v1.2.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-redis/redis/v8 v8.4.0
 	github.com/golang/protobuf v1.4.3
@@ -16,4 +16,3 @@ require (
 	google.golang.org/protobuf v1.25.0
 	gorm.io/gorm v1.20.7
 )
-

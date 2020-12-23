@@ -37,27 +37,32 @@ func InsertBasicDataToDatabase()  {
 	permission := []database.Permission{
 		{
 			Name: "User/Login",
-			Path: "User/Login",
+			Method: "POST",
+			Path: "/api/auth/*/user/login",
 			Auth: application.Auth_NoVerify,
 		},
 		{
 			Name: "User/Logout",
-			Path: "User/Logout",
+			Method: "POST",
+			Path: "/api/auth/*/user/logout",
 			Auth: application.Auth_NoVerify,
 		},
 		{
 			Name: "User/UpdateInformation",
-			Path: "User/UpdateInformation",
+			Method: "PUT",
+			Path: "/api/auth/*/user/updateInformation",
 			Auth: application.Auth_BasicVerify,
 		},
 		{
 			Name: "User/Get Current",
-			Path: "User/GetCurrent",
+			Method: "GET",
+			Path: "/api/auth/*/user/getCurrent",
 			Auth: application.Auth_BasicVerify,
 		},
 		{
 			Name: "User/View",
-			Path: "User/GetAll",
+			Method: "GET",
+			Path: "/api/auth/*/user/getAll",
 			Auth: application.Auth_AdvancedVerify,
 			Remark: "View user list",
 			Roles: []database.Role{
@@ -68,7 +73,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "User/Create",
-			Path: "User/Create",
+			Method: "POST",
+			Path: "/api/auth/*/user/create",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{
@@ -78,7 +84,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "User/Edit",
-			Path: "User/Edit",
+			Method: "PUT",
+			Path: "/api/auth/*/user/edit",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{
@@ -88,7 +95,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "User/Delete",
-			Path: "User/Delete",
+			Method: "DELETE",
+			Path: "/api/auth/*/user/delete",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{
@@ -98,7 +106,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "Role/View",
-			Path: "Role/GetAll",
+			Method: "GET",
+			Path: "/api/auth/*/role/getAll",
 			Remark: "View role list",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
@@ -109,7 +118,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "Role/Create",
-			Path: "Role/Create",
+			Method: "POST",
+			Path: "/api/auth/*/role/create",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{
@@ -119,7 +129,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "Role/Edit",
-			Path: "Role/Edit",
+			Method: "PUT",
+			Path: "/api/auth/*/role/edit",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{
@@ -129,7 +140,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "Role/Delete",
-			Path: "Role/Delete",
+			Method: "DELETE",
+			Path: "/api/auth/*/role/delete",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{
@@ -139,7 +151,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "Permission/GetAdvancedVerify",
-			Path: "Permission/GetAdvancedVerify",
+			Method: "GET",
+			Path: "/api/auth/*/permission/getAdvancedVerify",
 			Auth: application.Auth_AdvancedVerify,
 			Remark: "View permission list",
 			Roles: []database.Role{
@@ -150,7 +163,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "Permission/View",
-			Path: "Permission/GetAll",
+			Method: "GET",
+			Path: "/api/auth/*/permission/getAll",
 			Auth: application.Auth_AdvancedVerify,
 			Remark: "View permission list",
 			Roles: []database.Role{
@@ -161,7 +175,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "Permission/Create",
-			Path: "Permission/Create",
+			Method: "POST",
+			Path: "/api/auth/*/permission/create",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{
@@ -171,7 +186,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "Permission/Edit",
-			Path: "Permission/Edit",
+			Method: "PUT",
+			Path: "/api/auth/*/permission/edit",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{
@@ -181,7 +197,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "Permission/Delete",
-			Path: "Permission/Delete",
+			Method: "DELETE",
+			Path: "/api/auth/*/permission/delete",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{
@@ -191,7 +208,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "Menu/Create/Edit",
-			Path: "Menu/Create",
+			Method: "POST",
+			Path: "/api/auth/*/menu/create",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{
@@ -201,12 +219,14 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "Menu/Get All",
-			Path: "Menu/GetAll",
+			Method: "GET",
+			Path: "/api/auth/*/menu/getAll",
 			Auth: application.Auth_BasicVerify,
 		},
 		{
 			Name: "Setting/Cache Clear",
-			Path: "Setting/CacheClear",
+			Method: "GET",
+			Path: "/api/auth/*/setting/cacheClear",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{
@@ -216,17 +236,8 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "Setting/Disk Clean Up",
-			Path: "Setting/DiskCleanUp",
-			Auth: application.Auth_AdvancedVerify,
-			Roles: []database.Role{
-				{
-					Model:       gorm.Model{ID:1},
-				},
-			},
-		},
-		{
-			Name: "Setting/Disk Clean Up",
-			Path: "Setting/DiskCleanUp",
+			Method: "GET",
+			Path: "/api/auth/*/setting/diskCleanUp",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{
@@ -236,12 +247,14 @@ func InsertBasicDataToDatabase()  {
 		},
 		{
 			Name: "Attachment/Get One",
-			Path: "Attachment/GetOne",
+			Method: "GET",
+			Path: "/api/attachment/*/attachment/getOne",
 			Auth: application.Auth_NoVerify,
 		},
 		{
 			Name: "Attachment/Create",
-			Path: "Attachment/Create",
+			Method: "GET",
+			Path: "/api/attachment/*/attachment/diskCleanUp",
 			Auth: application.Auth_AdvancedVerify,
 			Roles: []database.Role{
 				{
