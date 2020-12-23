@@ -29,7 +29,10 @@ jobs:
           rm storage/config/auth.yaml.example
           rm storage/config/.gitignore
           rm storage/menu/.gitignore
+          rm storage/language/.gitignore
           mv storage/menu/menu.json.example storage/menu/menu.json
+          wget -P ./storage/language https://raw.githubusercontent.com/Etpmls/Etpmls-Micro/v1/file/zh.toml
+          wget -P ./storage/language https://raw.githubusercontent.com/Etpmls/Etpmls-Micro/v1/file/en.toml
 
       - name: Build normal
         run: |

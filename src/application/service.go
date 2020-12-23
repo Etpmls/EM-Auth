@@ -2,7 +2,7 @@ package application
 
 
 const (
-	Version_Service = "1.3.0"
+	Version_Service = "1.3.1"
 )
 
 /*
