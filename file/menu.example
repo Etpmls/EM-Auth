@@ -1,0 +1,58 @@
+[
+  {
+    "alwaysShow": true,
+    "children": [
+      {
+        "component": "EM-Auth/views/user/index",
+        "meta": {
+          "title": "user"
+        },
+        "name": "User",
+        "path": "user"
+      },
+      {
+        "component": "EM-Auth/views/role/index",
+        "meta": {
+          "title": "role"
+        },
+        "name": "Role",
+        "path": "role"
+      },
+      {
+        "component": "EM-Auth/views/permission/index",
+        "meta": {
+          "title": "permission"
+        },
+        "name": "Permission",
+        "path": "permission"
+      },
+      {
+        "component": "EM-Auth/views/menu/index",
+        "meta": {
+          "title": "menu"
+        },
+        "name": "Menu",
+        "path": "menu"
+      },
+      {
+        "component": "EM-Auth/views/setting/index",
+        "meta": {
+          "title": "setting"
+        },
+        "name": "Setting",
+        "path": "setting"
+      }
+    ],
+    "component": "Layout",
+    "meta": {
+      "icon": "el-icon-s-tools",
+      "roles": [
+        "Administrator"
+      ],
+      "title": "admin"
+    },
+    "name": "Admin",
+    "path": "/admin",
+    "redirect": "/admin/user"
+  }
+]

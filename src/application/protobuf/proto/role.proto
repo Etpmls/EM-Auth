@@ -1,0 +1,48 @@
+syntax = "proto3";
+package protobuf;
+option go_package = ".;protobuf";
+import "Etpmls/Etpmls-Micro/common.proto";
+import "google/api/annotations.proto";
+
+message RoleCreate {
+    string name=1;
+    string remark=2;
+    repeated em_protobuf.Id permissions=3;
+}
+
+message RoleEdit {
+    uint32 id=1;
+    string name=2;
+    string remark=3;
+    repeated em_protobuf.Id permissions=4;
+}
+
+message RoleDelete {
+    repeated em_protobuf.Id roles=1;
+}
+
+service Role {
+    rpc GetAll (em_protobuf.Pagination) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            get: "/api/auth/v1/role/getAll"
+        };
+    };
+    rpc Create (RoleCreate) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            post: "/api/auth/v1/role/create"
+            body: "*"
+        };
+    };
+    rpc Edit (RoleEdit) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            put: "/api/auth/v1/role/edit"
+            body: "*"
+        };
+    };
+    rpc Delete (RoleDelete) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            delete: "/api/auth/v1/role/delete"
+            body: "*"
+        };
+    };
+}

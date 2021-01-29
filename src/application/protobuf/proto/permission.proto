@@ -1,0 +1,57 @@
+syntax = "proto3";
+package protobuf;
+option go_package = ".;protobuf";
+import "Etpmls/Etpmls-Micro/common.proto";
+import "google/api/annotations.proto";
+
+message PermissionCreate {
+    string name=1;
+    uint32 auth=2;
+    string method=3;
+    string path=4;
+    string remark=5;
+}
+
+message PermissionEdit {
+    uint32 id=1;
+    string name=2;
+    uint32 auth=3;
+    string method=4;
+    string path=5;
+    string remark=6;
+}
+
+message PermissionDelete {
+    repeated em_protobuf.Id permissions=1;
+}
+
+service Permission {
+    rpc GetAll (em_protobuf.Pagination) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            get: "/api/auth/v1/permission/getAll"
+        };
+    };
+    rpc Create (PermissionCreate) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            post: "/api/auth/v1/permission/create"
+            body: "*"
+        };
+    };
+    rpc Edit (PermissionEdit) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            put: "/api/auth/v1/permission/edit"
+            body: "*"
+        };
+    };
+    rpc Delete (PermissionDelete) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            delete: "/api/auth/v1/permission/delete"
+            body: "*"
+        };
+    };
+    rpc GetAdvancedVerify (em_protobuf.Empty) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            get: "/api/auth/v1/permission/getAdvancedVerify"
+        };
+    };
+}

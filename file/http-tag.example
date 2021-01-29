@@ -1,0 +1,15 @@
+[
+    "traefik.http.routers.AuthHttpService.entrypoints=web,websecure",
+    "traefik.http.routers.AuthHttpService.rule=Host(`127.0.0.1`) && PathPrefix(`/api/auth/`)",
+    "traefik.http.routers.AuthHttpService.tls.certresolver=myresolver",
+    "traefik.http.routers.AuthHttpService.middlewares=forwardAuth@file,circuitBreaker_AuthHttpService@file",
+    "traefik.http.routers.AuthHttpService.service=AuthHttpService",
+
+    "traefik.http.routers.AuthHttpService_CheckAuth.entrypoints=web,websecure",
+    "traefik.http.routers.AuthHttpService_CheckAuth.rule=Host(`localhost`,`127.0.0.1`,`10.0.0.2`) && Path(`/api/checkAuth`)",
+    "traefik.http.routers.AuthHttpService_CheckAuth.tls.certresolver=myresolver",
+    "traefik.http.routers.AuthHttpService_CheckAuth.middlewares=circuitBreaker_AuthHttpService@file",
+    "traefik.http.routers.AuthHttpService_CheckAuth.service=AuthHttpService",
+
+    "traefik.http.services.AuthHttpService.loadbalancer.passhostheader=true"
+]

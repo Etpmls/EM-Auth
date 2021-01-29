@@ -1,0 +1,101 @@
+syntax = "proto3";
+package protobuf;
+option go_package = ".;protobuf";
+import "Etpmls/Etpmls-Micro/common.proto";
+import "google/api/annotations.proto";
+
+message UserRegister {
+    string username=1;
+    string password=2;
+}
+
+message UserLogin {
+    string username=1;
+    string password=2;
+    string captcha=3;
+}
+
+message UserCreate {
+    string username=1;
+    string password=2;
+    repeated em_protobuf.Id roles=3;
+}
+
+message UserEdit {
+    uint32 id=1;
+    string username=2;
+    string password=3;
+    repeated em_protobuf.Id roles=4;
+}
+
+message UserDelete {
+    repeated em_protobuf.Id users=1;
+}
+
+message UserGetCurrent {
+    string token=1;
+}
+
+message UserUpdateInformation {
+    message Avatar {
+        string path=1;
+    }
+    string password=1;
+    Avatar avatar=2;
+}
+
+
+service User {
+    rpc Register (UserRegister) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            post: "/api/auth/v1/user/register"
+            body: "*"
+        };
+    }
+    rpc Login (UserLogin) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            post: "/api/auth/v1/user/login"
+            body: "*"
+        };
+    };
+    rpc Logout (em_protobuf.Empty) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            post: "/api/auth/v1/user/logout"
+            body: "*"
+        };
+    }
+    rpc GetCurrent (UserGetCurrent) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            get: "/api/auth/v1/user/getCurrent"
+        };
+    };
+    rpc GetAll (em_protobuf.Pagination) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            get: "/api/auth/v1/user/getAll"
+        };
+    };
+    rpc Create (UserCreate) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            post: "/api/auth/v1/user/create"
+            body: "*"
+        };
+    };
+    rpc Edit (UserEdit) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            put: "/api/auth/v1/user/edit"
+            body: "*"
+        };
+    };
+    rpc Delete (UserDelete) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            delete: "/api/auth/v1/user/delete"
+            body: "*"
+        };
+    };
+    rpc UpdateInformation (UserUpdateInformation) returns (em_protobuf.Response) {
+        option (google.api.http) = {
+            put: "/api/auth/v1/user/updateInformation"
+            body: "*"
+        };
+    };
+}

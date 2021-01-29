@@ -1,0 +1,22 @@
+# AuthRpcService-1 is an example, you can replace it into your rpc-id
+
+service/AuthRpcService/http-tag: (Consistent with http-tag content)
+service/AuthRpcService/menu: (Consistent with menu content)
+service/AuthRpcService/database/enable:true (true/false)
+service/AuthRpcService/database/host:localhost (your database host)
+service/AuthRpcService/database/port:5432 (your database port)
+service/AuthRpcService/database/dbname: (your database name)
+service/AuthRpcService/database/user:postgres (your database user)
+service/AuthRpcService/database/password:postgres (your database password)
+service/AuthRpcService/database/prefix:em_ (your database table prefix)
+service/AuthRpcService/database/timezone:Asia/Shanghai (your database timezone)
+service/AuthRpcService/check-interval:60s (Time interval to check if the current application is healthy)
+service/AuthRpcService-1/address:192.168.1.200 (IP of current application)
+service/AuthRpcService-1/check-interval:60s (Time interval to check if the current application is healthy)
+service/AuthRpcService-1/check-url:/health (Custom url)
+service/AuthRpcService-1/http-id:AuthHTTPService-1
+service/AuthRpcService-1/http-name:AuthHttpService
+service/AuthRpcService-1/http-port:8081
+service/AuthRpcService-1/rpc-port:8080
+
+

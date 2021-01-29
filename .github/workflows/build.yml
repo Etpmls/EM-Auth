@@ -1,0 +1,95 @@
+name: Go Release
+
+on:
+  push:
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source & Use Golang
+        uses: actions/checkout@v2
+
+      - name: Use Golang
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.15' # The Go version to download (if necessary) and use.
+      - run: go version
+
+      - name: Process original files
+        run: |
+          cp .env.example .env
+          cp storage/config/app.yaml.example storage/config/app.yaml
+          cp storage/config/app.yaml.example storage/config/app_debug.yaml
+          rm storage/config/app.yaml.example
+          rm storage/config/.gitignore
+
+      - name: Build normal
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o postgresql-linux-amd64 -tags=postgresql main.go
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o mysql-linux-amd64 -tags=mysql main.go
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o postgresql-windows-amd64.exe -tags=postgresql main.go
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o mysql-windows-amd64.exe -tags=mysql main.go
+
+      - name: Compressed file
+        run: |
+          zip -r postgresql-linux-amd64.zip postgresql-linux-amd64 storage .env
+          zip -r mysql-linux-amd64.zip mysql-linux-amd64 storage .env
+          zip -r postgresql-windows-amd64.zip postgresql-windows-amd64.exe storage .env
+          zip -r mysql-windows-amd64.zip mysql-windows-amd64.exe storage .env
+
+      - name: Create Release
+        id: create_release
+        uses: monkeyWie/create-release@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload postgresql-linux-amd64.zip
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./postgresql-linux-amd64.zip
+          asset_name: postgresql-${{ steps.create_release.outputs.tag }}-linux-amd64.zip
+          asset_content_type: application/zip
+
+
+      - name: Upload mysql-linux-amd64.zip
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./mysql-linux-amd64.zip
+          asset_name: mysql-${{ steps.create_release.outputs.tag }}-linux-amd64.zip
+          asset_content_type: application/zip
+
+
+      - name: Upload postgresql-windows-amd64.zip
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./postgresql-windows-amd64.zip
+          asset_name: postgresql-${{ steps.create_release.outputs.tag }}-windows-amd64.zip
+          asset_content_type: application/zip
+
+
+      - name: Upload mysql-windows-amd64.zip
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./mysql-windows-amd64.zip
+          asset_name: mysql-${{ steps.create_release.outputs.tag }}-windows-amd64.zip
+          asset_content_type: application/zip
