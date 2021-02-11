@@ -40,7 +40,7 @@ func (this *middleware) Captcha() grpc.UnaryServerInterceptor {
 		}
 
 		// Debug Error Message
-		em.LogDebug.OutputSimplePath(response)
+		em.LogDebug.OutputSimplePath(string(response))
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_CaptchaVerificationFailed"), nil, err)
 	}
 }
