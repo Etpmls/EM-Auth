@@ -34,11 +34,13 @@ func (this *middleware) Captcha() grpc.UnaryServerInterceptor {
 			return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, "Please configure captcha/secret", nil, err)
 		}
 
-		ok2 := em.Captcha.Verify(m[define.KvCaptchaSecret], v.Captcha)
+		ok2, response := em.Captcha.VerifyV2(m[define.KvCaptchaSecret], v.Captcha)
 		if ok2 {
 			return handler(ctx, req)
 		}
 
+		// Debug Error Message
+		em.LogDebug.OutputSimplePath(response)
 		return em.ErrorRpc(codes.InvalidArgument, em.ERROR_Code, em.I18n.TranslateFromRequest(ctx, "ERROR_MESSAGE_CaptchaVerificationFailed"), nil, err)
 	}
 }

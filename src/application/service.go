@@ -2,7 +2,7 @@ package application
 
 
 const (
-	Version_Service = "2.0.0"
+	Version_Service = "2.0.1"
 )
 
 /* KV */
