@@ -1,0 +1,13 @@
+[
+	"traefik.http.routers.AuthHttpService.entrypoints=web",
+	"traefik.http.routers.AuthHttpService.rule=Host(`www.xxxxxx.com`) && PathPrefix(`/api/auth/`)",
+	"traefik.http.routers.AuthHttpService.middlewares=forwardAuth@file,circuitBreaker_AuthHttpService@file",
+	"traefik.http.routers.AuthHttpService.service=AuthHttpService",
+	
+	"traefik.http.routers.AuthHttpService_CheckAuth.entrypoints=web",
+	"traefik.http.routers.AuthHttpService_CheckAuth.rule=Host(`www.xxxxxx.com`) && Path(`/api/checkAuth`)",
+	"traefik.http.routers.AuthHttpService_CheckAuth.middlewares=circuitBreaker_AuthHttpService@file",
+	"traefik.http.routers.AuthHttpService_CheckAuth.service=AuthHttpService",
+	
+	"traefik.http.services.AuthHttpService.loadbalancer.passhostheader=true"
+]
