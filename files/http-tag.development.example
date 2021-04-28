@@ -5,8 +5,7 @@
     "traefik.http.routers.AuthHttpService.service=AuthHttpService",
 
     "traefik.http.routers.AuthHttpService_CheckAuth.entrypoints=web",
-	# 10.0.0.2 is your EM-Auth intranet IP address
-    "traefik.http.routers.AuthHttpService_CheckAuth.rule=Host(`127.0.0.1`,`10.0.0.2`) && Path(`/api/checkAuth`)",
+    "traefik.http.routers.AuthHttpService_CheckAuth.rule=Host(`127.0.0.1`) && Path(`/api/checkAuth`)",
     "traefik.http.routers.AuthHttpService_CheckAuth.middlewares=circuitBreaker_AuthHttpService@file",
     "traefik.http.routers.AuthHttpService_CheckAuth.service=AuthHttpService",
 
